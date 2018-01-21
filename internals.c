@@ -164,6 +164,31 @@ void init_resources()
     res4.waitList = NULL;    
 }
 
+int request(int rid, int n)
+{
+    RCB res;
+    switch(rid)
+    {
+        case 1:
+            res = res1;
+	    break;
+        case 2:
+            res = res2;
+            break;
+        case 3:
+            res = res3;
+            break;
+        case 4:
+            res = res4;
+            break;
+        default:
+            printf("request made for nonexistant resource");
+            return -1;
+    }
+    
+    return 1;
+}
+
 int main()
 {
     init_resources();
