@@ -174,8 +174,13 @@ void insert_res(struct RCB_node ** list, struct RCB_node * res)
         trav->next = res;
     }
 }
-
-int request(int rid, int n, PCB * activeProc)
+/*
+void remove_PCB_from_RL(PCB * activeProc)
+{
+    PCB_node * trav = readyList[activeProc->priority];
+}
+*/
+int request(int rid, int n, PCB_node * activeProc)
 {
     RCB * res;
     struct RCB_node * res_alloc;
@@ -205,7 +210,7 @@ int request(int rid, int n, PCB * activeProc)
         res_alloc->num = n;
         res_alloc->next = NULL;
         res->u -= n;
-        insert_res(&activeProc->other_resources, res_alloc);
+        insert_res(&activeProc->process->other_resources, res_alloc);
     }    
  
     return 1;
