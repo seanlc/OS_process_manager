@@ -26,7 +26,7 @@ typedef struct
     char * pid;					// process id
     struct RCB_node * other_resources;		// resources currenly held by process    
     status status_type;  			// ready, running, or blocked
-    struct PCB_node * list;		// ready list or resource wait list
+    struct PCB_node * list;			// ready list or resource wait list
     struct PCB * parent;			// points to parent process
     struct PCB_node * children;			// llist pointers to child PCBs
     int priority;				// 0-init 1-user 2-system
@@ -52,11 +52,13 @@ PCB * procList[50];
 int numProc = 0;
 
 // resources
-RCB res1[1];
-RCB res2[2];
-RCB res3[3];
-RCB res4[4];
+RCB res1;
+ 
+RCB res2;
 
+RCB res3;
+
+RCB res4;
 
 void add_to_RL(struct PCB_node * process, int priority)
 { 
@@ -69,7 +71,6 @@ void add_to_RL(struct PCB_node * process, int priority)
             trav = trav->next;
         trav->next = process;
     }
-
 }
 
 
@@ -140,8 +141,32 @@ PCB * get_ptr_of_pid(char * name)
     return NULL;    
 }
 
+void init_resources()
+{
+    res1.rid = 1;
+    res1.k = 1;
+    res1.u = 1;
+    res1.waitList = NULL;
+
+    res2.rid = 2;
+    res2.k = 2;
+    res2.u = 2;
+    res2.waitList = NULL;
+
+    res3.rid = 3;
+    res3.k = 3;
+    res3.u = 3;
+    res3.waitList = NULL;
+
+    res4.rid = 4;
+    res4.k = 4;
+    res4.u = 4;
+    res4.waitList = NULL;    
+}
+
 int main()
 {
+    init_resources();
     Create("p1",1);
     Create("p2",1);
 //    print_RL();
