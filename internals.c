@@ -5,9 +5,9 @@
 typedef enum {RUNNING = 1, READY = 2, BLOCKED = 3} status;
 
 // forward declaration of structs
-struct PCB;
-struct PCB_node;
-struct RCB_node;
+//struct PCB;
+//struct PCB_node;
+//struct RCB_node;
 
 // ready list
 struct PCB_node * readyList[3];
@@ -44,6 +44,7 @@ typedef struct
 RCB_node
 {
     RCB * resource;
+    int num;
     struct RCB_node * next;
 } RCB_node;
 
@@ -74,7 +75,7 @@ void add_to_RL(struct PCB_node * process, int priority)
 }
 
 
-void Create(char * name, int priority)
+PCB Create(char * name, int priority, struct PCB * activeProc)
 {
     // allocate PCB_node
     PCB_node * pNode = (PCB_node *) malloc(sizeof(PCB_node));
@@ -92,7 +93,7 @@ void Create(char * name, int priority)
     curProc->other_resources = NULL;
     curProc->status_type = READY;
     curProc->list = readyList[priority];
-    // TODO pNode->parent = ??
+    curProc->parent = activeProc;
     curProc->children = NULL;
     curProc->priority = priority;
     
@@ -102,6 +103,8 @@ void Create(char * name, int priority)
     //add to proclist
     procList[numProc++] = curProc;
     // TODO call scheduler
+    // take out return statement and change type
+    return *(pNode->process);
 }
 
 void print_RL()
@@ -164,38 +167,81 @@ void init_resources()
     res4.waitList = NULL;    
 }
 
-int request(int rid, int n)
+void insert_res(struct RCB_node ** list, struct RCB_node * res)
 {
-    RCB res;
+    RCB_node * trav = *list;
+    if(trav == NULL)
+        *list = res;
+    else
+    {
+        while(trav->next != NULL)
+            trav = trav->next;
+        trav->next = res;
+    }
+}
+
+int request(int rid, int n, PCB * activeProc)
+{
+    RCB * res;
+    struct RCB_node * res_alloc;
     switch(rid)
     {
         case 1:
-            res = res1;
+            res = &res1;
 	    break;
         case 2:
-            res = res2;
+            res = &res2;
             break;
         case 3:
-            res = res3;
+            res = &res3;
             break;
         case 4:
-            res = res4;
+            res = &res4;
             break;
         default:
             printf("request made for nonexistant resource");
             return -1;
     }
-    
+   
+    if(n <= res->u)
+    {
+        res_alloc = (RCB_node *) malloc(sizeof(RCB_node));
+        res_alloc->resource = res;
+        res_alloc->num = n;
+        res_alloc->next = NULL;
+        res->u -= n;
+        insert_res(&activeProc->other_resources, res_alloc);
+    }    
+ 
     return 1;
 }
+
+void print_PCB_res_list(RCB_node * lst)
+{
+    printf("process holds: \n");
+    RCB_node * trav = lst;
+    while(trav != NULL)
+    {
+        printf("resource count: %d\n", trav->num);
+        trav = trav->next;
+    }
+}
+
 
 int main()
 {
     init_resources();
-    Create("p1",1);
-    Create("p2",1);
-//    print_RL();
-    print_PL();
+    PCB  p1 = Create("p1",1, NULL);
+    request(1,1,&p1);
+    print_PCB_res_list(p1.other_resources);
+    printf("number of r1 remaining: %d\n", res1.u);
+//    print_PL();
+    request(2,2,&p1);
+    print_PCB_res_list(p1.other_resources);
+    printf("number of r2 remaining: %d\n", res2.u);
 
+    request(1,1,&p1);
+    print_PCB_res_list(p1.other_resources);
+    printf("number of r1 remaining: %d\n", res1.u);
     return 0;
 }
