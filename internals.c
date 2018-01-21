@@ -174,12 +174,29 @@ void insert_res(struct RCB_node ** list, struct RCB_node * res)
         trav->next = res;
     }
 }
-/*
-void remove_PCB_from_RL(PCB * activeProc)
+
+void remove_PCB_from_RL(PCB_node * proc)
 {
-    PCB_node * trav = readyList[activeProc->priority];
+    PCB * curProc = proc->process;
+    PCB_node * trav = readyList[curProc->priority];
+    if(trav != NULL && proc != NULL)
+    {
+        if(strcmp(proc->process->pid, trav->process->pid) == 0)
+        {
+	    // remove from head
+            readyList[curProc->priority] = trav->next;
+        }
+        else
+        {
+	    // attempt to remove from tail
+            while(trav->next != NULL && strcmp(proc->process->pid, trav->next->process->pid) != 0)
+		trav = trav->next;
+           if(strcmp(proc->process->pid, trav->next->process->pid) == 0)
+	        trav->next = trav->next->next;
+        }
+    }
 }
-*/
+
 int request(int rid, int n, PCB_node * activeProc)
 {
     RCB * res;
