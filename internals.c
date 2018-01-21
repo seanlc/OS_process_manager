@@ -12,8 +12,6 @@ struct RCB_node;
 // ready list
 struct PCB_node * readyList[3];
 
-//list of all active processes
-struct PCB_node * procList;
 
 typedef struct 
 {
@@ -49,6 +47,10 @@ RCB_node
     struct RCB_node * next;
 } RCB_node;
 
+//list of all active processes
+PCB * procList[50];
+int numProc = 0;
+
 // resources
 RCB res1[1];
 RCB res2[2];
@@ -70,18 +72,6 @@ void add_to_RL(struct PCB_node * process, int priority)
 
 }
 
-void add_to_PL(struct PCB_node * process)
-{    
-    struct PCB_node * trav = procList;
-    if(trav == NULL)
-        procList = process;
-    else
-    {
-        while(trav->next != NULL)
-            trav = trav->next;
-        trav->next = process;
-    }
-}
 
 void Create(char * name, int priority)
 {
@@ -109,13 +99,14 @@ void Create(char * name, int priority)
     add_to_RL(pNode, priority);
     
     //add to proclist
-
+    procList[numProc++] = curProc;
     // TODO call scheduler
 }
 
 void print_RL()
 {
     struct PCB_node * trav;
+    printf("READY LIST: \n");
     for(int i = 0; i < 3; ++i)
     {
         printf("priority %d: ", i);
@@ -129,6 +120,15 @@ void print_RL()
         
     }
 }
+void print_PL()
+{
+    printf("ALL PROCESSES: \n");
+    for(int i = 0; i < numProc; ++i)
+    {
+        printf("process: %s ", procList[i]->pid);
+    }
+    printf("\n");
+}
 /*
 PCB_node * get_ptr_of_pid(char * name)
 {
@@ -140,6 +140,6 @@ int main()
     Create("p1",1);
     Create("p2",1);
     print_RL();
-//    print_PL();
+    print_PL();
     return 0;
 }
