@@ -129,17 +129,23 @@ void print_PL()
     }
     printf("\n");
 }
-/*
-PCB_node * get_ptr_of_pid(char * name)
+
+PCB * get_ptr_of_pid(char * name)
 {
-    
+    for(int i = 0; i < numProc; ++i)
+    {
+        if(strcmp(procList[i]->pid, name) == 0)
+            return procList[i];
+    }
+    return NULL;    
 }
-*/
+
 int main()
 {
     Create("p1",1);
     Create("p2",1);
-    print_RL();
+//    print_RL();
     print_PL();
+
     return 0;
 }
