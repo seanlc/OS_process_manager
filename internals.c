@@ -4,11 +4,6 @@
 
 typedef enum {RUNNING = 1, READY = 2, BLOCKED = 3} status;
 
-// forward declaration of structs
-//struct PCB;
-//struct PCB_node;
-//struct RCB_node;
-
 // ready list
 struct PCB_node * readyList[3];
 
@@ -227,21 +222,3 @@ void print_PCB_res_list(RCB_node * lst)
     }
 }
 
-
-int main()
-{
-    init_resources();
-    PCB  p1 = Create("p1",1, NULL);
-    request(1,1,&p1);
-    print_PCB_res_list(p1.other_resources);
-    printf("number of r1 remaining: %d\n", res1.u);
-//    print_PL();
-    request(2,2,&p1);
-    print_PCB_res_list(p1.other_resources);
-    printf("number of r2 remaining: %d\n", res2.u);
-
-    request(1,1,&p1);
-    print_PCB_res_list(p1.other_resources);
-    printf("number of r1 remaining: %d\n", res1.u);
-    return 0;
-}
