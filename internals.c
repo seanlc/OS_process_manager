@@ -244,7 +244,16 @@ int request(int rid, int n, PCB_node * activeProc)
         res_alloc->next = NULL;
         res->u -= n;
         insert_res(&activeProc->process->other_resources, res_alloc);
-    }    
+    } 
+    else
+    {
+        activeProc->process->status_type = BLOCKED;
+        activeProc->process->list = res->waitList; 
+        // remove self from readyList
+        remove_PCB_from_RL(activeProc);
+        // add self to res waitList
+        add_PCB_to_waitList(activeProc, res);
+    }   
  
     return 1;
 }

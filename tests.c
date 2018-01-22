@@ -7,6 +7,7 @@ void test_request()
     nd->next = NULL;
     PCB  p1 = Create("p1",1, NULL);
     nd->process = &p1;
+    
     request(1,1,nd);
     print_PCB_res_list(p1.other_resources);
     printf("number of r1 remaining: %d\n", res1.u);
@@ -15,9 +16,14 @@ void test_request()
     print_PCB_res_list(p1.other_resources);
     printf("number of r2 remaining: %d\n", res2.u);
 
+    print_RL();   
+
     request(1,1,nd);
     print_PCB_res_list(p1.other_resources);
     printf("number of r1 remaining: %d\n", res1.u);
+
+    print_RCB_waitList(res1.waitList);
+    print_RL();
     
     free(nd);
 }
@@ -70,16 +76,12 @@ void test_remove_RL_add_WL()
 
     print_RL();
 }
-/*
-void test_request()
-{
 
-}
-*/
+
 int main()
 {
     init_resources();
-//    test_request();
-    test_remove_RL_add_WL();
+    test_request();
+//    test_remove_RL_add_WL();
     return 0;
 }
