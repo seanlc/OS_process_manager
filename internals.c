@@ -197,6 +197,22 @@ void remove_PCB_from_RL(PCB_node * proc)
     }
 }
 
+// void remove_PCB_from_waitList(PCB_node * proc, RCB * res)
+
+
+void add_PCB_to_waitList(PCB_node * proc, RCB * res)
+{
+    PCB_node * trav = res->waitList;
+    if(trav == NULL)
+        res->waitList = proc;
+    else
+    {
+        while(trav->next != NULL)
+            trav = trav->next;
+        trav->next = proc;        
+    }
+}
+
 int request(int rid, int n, PCB_node * activeProc)
 {
     RCB * res;
@@ -244,3 +260,14 @@ void print_PCB_res_list(RCB_node * lst)
     }
 }
 
+void print_RCB_waitList(PCB_node * lst)
+{
+    PCB_node * trav = lst;
+    printf("waiting list for resource: ");
+    while(trav != NULL)
+    {
+        printf("process: %s", lst->process->pid);
+        trav = trav->next;
+    }
+    printf("\n");
+}

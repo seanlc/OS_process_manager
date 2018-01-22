@@ -46,13 +46,40 @@ void test_remove_from_RL()
 
     remove_PCB_from_RL(nd3);
     print_RL();
-    
 }
 
+void test_remove_RL_add_WL()
+{
+    PCB_node * nd = (PCB_node *) malloc(sizeof(PCB_node));
+    nd->next = NULL;
+    PCB  p1 = Create("p1",1, NULL);
+    nd->process = &p1;
+
+    PCB_node * nd2 = (PCB_node *) malloc(sizeof(PCB_node));
+    nd2->next = NULL;
+    PCB  p2 = Create("p2",1, NULL);
+    nd2->process = &p2;
+
+    print_RL();
+
+    remove_PCB_from_RL(nd);
+    print_RL();
+
+    add_PCB_to_waitList(nd, &res1);
+    print_RCB_waitList(res1.waitList);
+
+    print_RL();
+}
+/*
+void test_request()
+{
+
+}
+*/
 int main()
 {
     init_resources();
 //    test_request();
-    test_remove_from_RL();
+    test_remove_RL_add_WL();
     return 0;
 }
