@@ -1,6 +1,28 @@
 #include "stdio.h"
 #include "internals.c"
 
+void test_find_ready_PCB()
+{
+    PCB_node * nd = (PCB_node *) malloc(sizeof(PCB_node));
+    nd->next = NULL;
+    PCB  p1 = Create("p1",1, NULL);
+    nd->process = &p1;
+
+    PCB_node * nd2 = (PCB_node *) malloc(sizeof(PCB_node));
+    nd2->next = NULL;
+    PCB  p2 = Create("p2",1, NULL);
+    nd2->process = &p2;
+    
+    request(1,1,nd);
+    print_PCB_res_list(p1.other_resources);
+
+    request(1,1,nd2);
+    
+    release(1,1,nd);
+
+    print_RCB_waitList(res1.waitList);
+}
+
 void test_remove_RCB_from_PCB()
 {
     
@@ -125,7 +147,8 @@ void test_remove_RL_add_WL()
 int main()
 {
     init_resources();
-    test_remove_RCB_from_PCB();
+    test_find_ready_PCB();
+//    test_remove_RCB_from_PCB();
 //    test_release();
 //    test_request();
 //    test_remove_RL_add_WL();
