@@ -277,6 +277,8 @@ int request(int rid, int n, PCB_node * activeProc)
         add_PCB_to_waitList(activeProc, res);
     }   
  
+
+    // call Scheduler()
     return 1;
 }
 
@@ -301,4 +303,39 @@ void print_RCB_waitList(PCB_node * lst)
         trav = trav->next;
     }
     printf("\n");
+}
+
+int release(int rid, int n, PCB_node * activeProc)
+{
+    RCB * res = NULL;
+    RCB_node * res_node = NULL;
+    switch(rid)
+    {
+        case 1:
+	    res = &res1;
+	    break;
+	
+	case 2:
+	    res = &res2;
+	    break;
+
+	case 3:
+	    res = &res3;
+	    break;
+
+	case 4:
+	    res = &res4;
+	    break;
+        
+	default:
+            printf("request made for nonexistant resource");
+            return -1;
+    }
+
+    res_node = find_res_node(rid, activeProc);
+    printf("foudn RCB_node with rid %d and count %d\n", res_node->resource->rid, res_node->num);
+
+
+    // call Scheduler()
+    return 1;    
 }

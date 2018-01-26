@@ -12,7 +12,11 @@ void test_request()
     print_PCB_res_list(p1.other_resources);
     printf("number of r1 remaining: %d\n", res1.u);
 
-    request(2,2,nd);
+    request(2,1,nd);
+    print_PCB_res_list(p1.other_resources);
+    printf("number of r2 remaining: %d\n", res2.u);
+
+    request(2,1,nd);
     print_PCB_res_list(p1.other_resources);
     printf("number of r2 remaining: %d\n", res2.u);
 
@@ -26,6 +30,23 @@ void test_request()
     print_RL();
     
     free(nd);
+}
+
+void test_release()
+{
+    PCB_node * nd = (PCB_node *) malloc(sizeof(PCB_node));
+    nd->next = NULL;
+    PCB p1 = Create("p1", 1, NULL);
+    nd->process = &p1;
+
+    request(4, 2, nd);
+
+    print_PCB_res_list(p1.other_resources);
+    
+    release(4,1, nd);
+
+    print_PCB_res_list(p1.other_resources);
+    free(nd); 
 }
 
 void test_remove_from_RL()
@@ -81,7 +102,8 @@ void test_remove_RL_add_WL()
 int main()
 {
     init_resources();
-    test_request();
+    test_release();
+//    test_request();
 //    test_remove_RL_add_WL();
     return 0;
 }
