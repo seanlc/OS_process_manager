@@ -217,10 +217,19 @@ void add_PCB_to_waitList(PCB_node * proc, RCB * res)
     }
 }
 
+RCB_node * find_res_node(int rid, PCB_node * activeProc)
+{
+    RCB_node * trav = activeProc->process->other_resources;
+    if(trav != NULL && trav->resource->rid != rid)
+        trav = trav->next; 
+    return trav;
+}
+
 int request(int rid, int n, PCB_node * activeProc)
 {
     RCB * res;
     struct RCB_node * res_alloc;
+    struct RCB_node * res_node;
     switch(rid)
     {
         case 1:
@@ -242,14 +251,21 @@ int request(int rid, int n, PCB_node * activeProc)
     
     activeProc->num_req = n;
 
+
+
     if(n <= res->u)
     {
-        res_alloc = (RCB_node *) malloc(sizeof(RCB_node));
-        res_alloc->resource = res;
-        res_alloc->num = n;
-        res_alloc->next = NULL;
+	if((res_node = find_res_node(rid, activeProc)) != NULL)
+	    res_node->num += n;
+	else
+	{
+            res_alloc = (RCB_node *) malloc(sizeof(RCB_node));
+            res_alloc->resource = res;
+            res_alloc->num = n;
+            res_alloc->next = NULL;
+            insert_res(&activeProc->process->other_resources, res_alloc);
+	}
         res->u -= n;
-        insert_res(&activeProc->process->other_resources, res_alloc);
     } 
     else
     {
@@ -270,7 +286,7 @@ void print_PCB_res_list(RCB_node * lst)
     RCB_node * trav = lst;
     while(trav != NULL)
     {
-        printf("resource count: %d\n", trav->num);
+        printf("resource %d count %d\n", trav->resource->rid, trav->num);
         trav = trav->next;
     }
 }
