@@ -31,6 +31,7 @@ typedef struct
 PCB_node
 {
     PCB * process;
+    int num_req;
     struct PCB_node * next;
     
 } PCB_node;
@@ -203,6 +204,9 @@ void remove_PCB_from_RL(PCB_node * proc)
 void add_PCB_to_waitList(PCB_node * proc, RCB * res)
 {
     PCB_node * trav = res->waitList;
+
+    printf("number of resources requrested by process: %d\n", proc->num_req);
+
     if(trav == NULL)
         res->waitList = proc;
     else
@@ -235,7 +239,9 @@ int request(int rid, int n, PCB_node * activeProc)
             printf("request made for nonexistant resource");
             return -1;
     }
-   
+    
+    activeProc->num_req = n;
+
     if(n <= res->u)
     {
         res_alloc = (RCB_node *) malloc(sizeof(RCB_node));
