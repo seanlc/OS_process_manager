@@ -1,6 +1,24 @@
 #include "stdio.h"
 #include "internals.c"
 
+void test_remove_RCB_from_PCB()
+{
+    
+    PCB_node * nd = (PCB_node *) malloc(sizeof(PCB_node));
+    nd->next = NULL;
+    PCB  p1 = Create("p1",1, NULL);
+    nd->process = &p1;
+    
+    request(2,2,nd);
+    print_PCB_res_list(p1.other_resources);
+    printf("number of r2 remaining: %d\n", res2.u);
+
+    printf("after removal of res1 from p1->other_resources\n");
+    remove_RCB_from_PCB(1,&(nd->process->other_resources));
+    print_PCB_res_list(p1.other_resources);
+
+}
+
 void test_request()
 {
     PCB_node * nd = (PCB_node *) malloc(sizeof(PCB_node));
@@ -43,7 +61,7 @@ void test_release()
 
     print_PCB_res_list(p1.other_resources);
     
-    release(4,1, nd);
+    release(4,2, nd);
 
     print_PCB_res_list(p1.other_resources);
     free(nd); 
@@ -102,7 +120,8 @@ void test_remove_RL_add_WL()
 int main()
 {
     init_resources();
-    test_release();
+    test_remove_RCB_from_PCB();
+//    test_release();
 //    test_request();
 //    test_remove_RL_add_WL();
     return 0;

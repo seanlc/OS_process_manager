@@ -305,6 +305,30 @@ void print_RCB_waitList(PCB_node * lst)
     printf("\n");
 }
 
+void remove_RCB_from_PCB(int rid, RCB_node ** lst)
+{
+    RCB_node * trav = *lst;
+    RCB_node * trail = NULL;
+    RCB_node * tmp = NULL;
+    while(trav != NULL && trav->resource->rid != rid)
+    {
+	trail = trav;
+        trav = trav->next;
+    }
+    if(trav == *lst)
+    {
+        // head deletion
+	tmp = *lst;
+	*lst = (*lst)->next;
+	free(tmp);
+	tmp = NULL;
+    }
+    /*else
+    {
+        // tail deletion
+    } */
+}
+
 int release(int rid, int n, PCB_node * activeProc)
 {
     RCB * res = NULL;
@@ -333,8 +357,18 @@ int release(int rid, int n, PCB_node * activeProc)
     }
 
     res_node = find_res_node(rid, activeProc);
-    printf("foudn RCB_node with rid %d and count %d\n", res_node->resource->rid, res_node->num);
+//    printf("foudn RCB_node with rid %d and count %d\n", res_node->resource->rid, res_node->num);
 
+    if(res_node->num >= n)
+    {
+        res_node->num -= n;
+//	if(count == 0)
+//	{
+	    // remove res_node from activeProc->other_resources
+	    // free(red_node)
+//	}
+	res->u += n;
+    }  
 
     // call Scheduler()
     return 1;    
