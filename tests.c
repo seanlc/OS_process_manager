@@ -9,12 +9,17 @@ void test_remove_RCB_from_PCB()
     PCB  p1 = Create("p1",1, NULL);
     nd->process = &p1;
     
+    request(1,1,nd);
+    print_PCB_res_list(p1.other_resources);
+
     request(2,2,nd);
     print_PCB_res_list(p1.other_resources);
-    printf("number of r2 remaining: %d\n", res2.u);
 
-    printf("after removal of res1 from p1->other_resources\n");
-    remove_RCB_from_PCB(1,&(nd->process->other_resources));
+    request(3,3,nd);
+    print_PCB_res_list(p1.other_resources);
+    
+    printf("after removal of res2 from p1->other_resources\n");
+    remove_RCB_from_PCB(2,&(nd->process->other_resources));
     print_PCB_res_list(p1.other_resources);
 
 }

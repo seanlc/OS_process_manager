@@ -220,7 +220,7 @@ void add_PCB_to_waitList(PCB_node * proc, RCB * res)
 RCB_node * find_res_node(int rid, PCB_node * activeProc)
 {
     RCB_node * trav = activeProc->process->other_resources;
-    if(trav != NULL && trav->resource->rid != rid)
+    while(trav != NULL && trav->resource->rid != rid)
         trav = trav->next; 
     return trav;
 }
@@ -318,15 +318,15 @@ void remove_RCB_from_PCB(int rid, RCB_node ** lst)
     if(trav == *lst)
     {
         // head deletion
-	tmp = *lst;
 	*lst = (*lst)->next;
-	free(tmp);
-	tmp = NULL;
     }
-    /*else
+    else
     {
-        // tail deletion
-    } */
+	//tail deletion
+        trail->next = trav->next; 
+    } 
+    free(trav);
+    trav = NULL;
 }
 
 int release(int rid, int n, PCB_node * activeProc)
