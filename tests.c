@@ -30,10 +30,14 @@ void test_find_ready_PCB()
     request(1,1,nd3);
     request(1,3,nd4);
 
+    print_RL();   
+
     release(1,1,nd);    
 
-    print_PCB_res_list(p1.other_resources);
-    print_RCB_waitList(res1.waitList);
+//    print_PCB_res_list(p1.other_resources);
+//    print_RCB_waitList(res1.waitList);
+
+    print_RL();    
 }
 
 void test_remove_RCB_from_PCB()

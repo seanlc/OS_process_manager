@@ -358,6 +358,7 @@ int release(int rid, int n, PCB_node * activeProc)
     RCB * res = NULL;
     RCB_node * res_node = NULL;
     PCB_node * launchProc = NULL;
+    struct RCB_node * res_alloc;
     switch(rid)
     {
         case 1:
@@ -380,7 +381,8 @@ int release(int rid, int n, PCB_node * activeProc)
             printf("request made for nonexistant resource");
             return -1;
     }
-
+    
+    // find RCB_node held by activeProc with rid matching argument
     res_node = find_res_node(rid, activeProc);
 //    printf("foudn RCB_node with rid %d and count %d\n", res_node->resource->rid, res_node->num);
 
@@ -401,7 +403,22 @@ int release(int rid, int n, PCB_node * activeProc)
 	if((launchProc = find_ready_PCB_on_waitList(res->waitList, res->u)) != NULL)
         {
 	    printf("found ready process %s\n", launchProc->process->pid);
-	    remove_PCB_from_waitList( &res->waitList, launchProc->process->pid); 
+	    remove_PCB_from_waitList( &res->waitList, launchProc->process->pid);
+            launchProc->process->status_type = READY;
+	    launchProc->process->list = readyList[launchProc->process->priority];
+	    launchProc->next = NULL;
+	    res->u -= launchProc->num_req;
+            
+	    // make new RCB_node and insert into launchProc->other_resources
+	    // make below a function and call in request() as well 
+            res_alloc = (RCB_node *) malloc(sizeof(RCB_node));
+            res_alloc->resource = res;
+            res_alloc->num = launchProc->num_req ;
+            res_alloc->next = NULL;
+            insert_res(&launchProc->process->other_resources, res_alloc);
+
+	    //insert into RL
+	    add_to_RL(launchProc ,launchProc->process->priority);
 	}
     }  
 
