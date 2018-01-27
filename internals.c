@@ -242,6 +242,16 @@ RCB_node * find_res_node(int rid, PCB_node * activeProc)
     return trav;
 }
 
+RCB_node * alc_RCB_node(RCB * res, int num_req)
+{
+    RCB_node * res_alloc = NULL;
+    res_alloc = (RCB_node *) malloc(sizeof(RCB_node));
+    res_alloc->resource = res;
+    res_alloc->num = num_req ;
+    res_alloc->next = NULL;
+    return res_alloc;
+}
+
 int request(int rid, int n, PCB_node * activeProc)
 {
     RCB * res;
@@ -276,10 +286,7 @@ int request(int rid, int n, PCB_node * activeProc)
 	    res_node->num += n;
 	else
 	{
-            res_alloc = (RCB_node *) malloc(sizeof(RCB_node));
-            res_alloc->resource = res;
-            res_alloc->num = n;
-            res_alloc->next = NULL;
+	    res_alloc = alc_RCB_node(res, n);
             insert_res(&activeProc->process->other_resources, res_alloc);
 	}
         res->u -= n;
@@ -402,18 +409,19 @@ int release(int rid, int n, PCB_node * activeProc)
 	if((launchProc = find_ready_PCB_on_waitList(res->waitList, res->u)) != NULL)
         {
 	    printf("found ready process %s\n", launchProc->process->pid);
+	    // remove found PCB from res waitList
 	    remove_PCB_from_waitList( &res->waitList, launchProc->process->pid);
+
+	    // change parameters of launchProc to reflect removal from list
             launchProc->process->status_type = READY;
 	    launchProc->process->list = readyList[launchProc->process->priority];
 	    launchProc->next = NULL;
+
+	    // update available resource number
 	    res->u -= launchProc->num_req;
             
 	    // make new RCB_node and insert into launchProc->other_resources
-	    // make below a function and call in request() as well 
-            res_alloc = (RCB_node *) malloc(sizeof(RCB_node));
-            res_alloc->resource = res;
-            res_alloc->num = launchProc->num_req ;
-            res_alloc->next = NULL;
+	    res_alloc = alc_RCB_node(res, launchProc->num_req);
             insert_res(&launchProc->process->other_resources, res_alloc);
 
 	    //insert into RL
