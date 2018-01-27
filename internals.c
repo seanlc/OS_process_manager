@@ -319,7 +319,6 @@ void print_RCB_waitList(PCB_node * lst)
         printf("process: %s\n", trav->process->pid);
         trav = trav->next;
     }
-    printf("\n");
 }
 
 void remove_RCB_from_PCB(int rid, RCB_node ** lst)

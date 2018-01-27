@@ -26,16 +26,16 @@ void test_find_ready_PCB()
     request(1,1,nd);
     print_PCB_res_list(p1.other_resources);
 
-    request(1,2,nd2);
-    request(1,1,nd3);
-    request(1,3,nd4);
+    request(1,3,nd2);
+    request(1,3,nd3);
+    request(1,1,nd4);
 
     print_RL();   
 
     release(1,1,nd);    
 
 //    print_PCB_res_list(p1.other_resources);
-//    print_RCB_waitList(res1.waitList);
+    print_RCB_waitList(res1.waitList);
 
     print_RL();    
 }
