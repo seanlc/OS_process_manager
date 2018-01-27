@@ -192,13 +192,31 @@ void remove_PCB_from_RL(PCB_node * proc)
 	    // attempt to remove from tail
             while(trav->next != NULL && strcmp(proc->process->pid, trav->next->process->pid) != 0)
 		trav = trav->next;
-           if(strcmp(proc->process->pid, trav->next->process->pid) == 0)
+            if(strcmp(proc->process->pid, trav->next->process->pid) == 0)
 	        trav->next = trav->next->next;
         }
     }
 }
 
-void remove_PCB_from_waitList(PCB_node * waitList, char * pid);
+void remove_PCB_from_waitList(PCB_node ** waitList, char * pid)
+{
+    PCB_node * trav = *waitList;
+    if(trav != NULL)
+    {
+        if(strcmp(trav->process->pid, pid) == 0)
+	{
+	    // head removal
+	    *waitList = trav->next;
+	}
+	else
+	{
+	    while(trav->next != NULL && strcmp(pid, trav->next->process->pid) != 0)
+	        trav = trav->next;
+	    if(strcmp(pid, trav->next->process->pid) == 0)
+	        trav->next = trav->next->next;
+	}
+    }
+}
 
 void add_PCB_to_waitList(PCB_node * proc, RCB * res)
 {
@@ -298,7 +316,7 @@ void print_RCB_waitList(PCB_node * lst)
     printf("waiting list for resource: ");
     while(trav != NULL)
     {
-        printf("process: %s", lst->process->pid);
+        printf("process: %s\n", trav->process->pid);
         trav = trav->next;
     }
     printf("\n");
@@ -373,7 +391,10 @@ int release(int rid, int n, PCB_node * activeProc)
 	    remove_RCB_from_PCB(rid, &activeProc->process->other_resources);
 	res->u += n;
 	if((launchProc = find_ready_PCB_on_waitList(res->waitList, res->u)) != NULL)
+        {
 	    printf("found ready process %s\n", launchProc->process->pid);
+	    remove_PCB_from_waitList( &res->waitList, launchProc->process->pid); 
+	}
     }  
 
     // call Scheduler()

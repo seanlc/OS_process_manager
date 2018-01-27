@@ -12,13 +12,25 @@ void test_find_ready_PCB()
     nd2->next = NULL;
     PCB  p2 = Create("p2",1, NULL);
     nd2->process = &p2;
-    
+
+    PCB_node * nd3 = (PCB_node *) malloc(sizeof(PCB_node));
+    nd3->next = NULL;
+    PCB  p3 = Create("p3",1, NULL);
+    nd3->process = &p3;
+
+    PCB_node * nd4 = (PCB_node *) malloc(sizeof(PCB_node));
+    nd4->next = NULL;
+    PCB  p4 = Create("p4",1, NULL);
+    nd4->process = &p4;
+
     request(1,1,nd);
     print_PCB_res_list(p1.other_resources);
 
-    request(1,1,nd2);
-    
-    release(1,1,nd);
+    request(1,2,nd2);
+    request(1,1,nd3);
+    request(1,3,nd4);
+
+    release(1,1,nd);    
 
     print_RCB_waitList(res1.waitList);
 }
