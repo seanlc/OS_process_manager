@@ -32,6 +32,7 @@ void test_find_ready_PCB()
 
     release(1,1,nd);    
 
+    print_PCB_res_list(p1.other_resources);
     print_RCB_waitList(res1.waitList);
 }
 

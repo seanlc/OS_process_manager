@@ -386,10 +386,18 @@ int release(int rid, int n, PCB_node * activeProc)
 
     if(res_node->num >= n)
     {
+	// decrease count of resource in RCB_node held in other_resources
         res_node->num -= n;
+
+	// if count of resource has fallen to 0, remove the RCB_node from other_resources
 	if(res_node->num == 0)
 	    remove_RCB_from_PCB(rid, &activeProc->process->other_resources);
+
+	// increase count of resource by newly free n
 	res->u += n;
+
+	// check for for processes waiting on resources that can become ready with newly available resources
+	// if found, have proc claim resources and move to ready list
 	if((launchProc = find_ready_PCB_on_waitList(res->waitList, res->u)) != NULL)
         {
 	    printf("found ready process %s\n", launchProc->process->pid);
