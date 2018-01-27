@@ -23,19 +23,19 @@ void test_find_ready_PCB()
     PCB  p4 = Create("p4",1, NULL);
     nd4->process = &p4;
 
-    request(1,1,nd);
+    request(4,4,nd);
     print_PCB_res_list(p1.other_resources);
 
-    request(1,3,nd2);
-    request(1,3,nd3);
-    request(1,1,nd4);
+    request(4,1,nd2);
+    request(4,1,nd3);
+    request(4,1,nd4);
 
     print_RL();   
 
-    release(1,1,nd);    
+    release(4,4,nd);    
 
 //    print_PCB_res_list(p1.other_resources);
-    print_RCB_waitList(res1.waitList);
+    print_RCB_waitList(res4.waitList);
 
     print_RL();    
 }

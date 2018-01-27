@@ -406,7 +406,7 @@ int release(int rid, int n, PCB_node * activeProc)
 
 	// check for for processes waiting on resources that can become ready with newly available resources
 	// if found, have proc claim resources and move to ready list
-	if((launchProc = find_ready_PCB_on_waitList(res->waitList, res->u)) != NULL)
+	while((launchProc = find_ready_PCB_on_waitList(res->waitList, res->u)) != NULL)
         {
 	    printf("found ready process %s\n", launchProc->process->pid);
 	    // remove found PCB from res waitList
