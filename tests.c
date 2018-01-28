@@ -1,23 +1,62 @@
 #include "stdio.h"
 #include "internals.c"
 
-void test_free_all_res_held_by_PCB()
+void test_remove_first_process_on_blocked_list()
 {
+    PCB_node * nd2 = (PCB_node *) malloc(sizeof(PCB_node));
+    nd2->next = NULL;
+    PCB  p2 = Create("p2",1, NULL);
+    nd2->process = &p2;
+
     PCB_node * nd = (PCB_node *) malloc(sizeof(PCB_node));
     nd->next = NULL;
     PCB  p1 = Create("p1",1, NULL);
     nd->process = &p1;
 
+    PCB_node * nd3 = (PCB_node *) malloc(sizeof(PCB_node));
+    nd3->next = NULL;
+    PCB  p3 = Create("p3",1, NULL);
+    nd3->process = &p3;
+
     request(1,1,nd);
-    request(2,2,nd);
-    request(3,3,nd);
+    request(1,1,nd2);
+    request(1,1,nd3);
+
+    release(1,1,nd);
+    print_RCB_waitList(res1.waitList);
+    
+}
+
+void test_free_all_res_held_by_PCB()
+{
+    PCB_node * nd2 = (PCB_node *) malloc(sizeof(PCB_node));
+    nd2->next = NULL;
+    PCB  p2 = Create("p2",1, NULL);
+    nd2->process = &p2;
+
+    PCB_node * nd = (PCB_node *) malloc(sizeof(PCB_node));
+    nd->next = NULL;
+    PCB  p1 = Create("p1",1, NULL);
+    nd->process = &p1;
+
+    PCB_node * nd3 = (PCB_node *) malloc(sizeof(PCB_node));
+    nd3->next = NULL;
+    PCB  p3 = Create("p3",1, NULL);
+    nd3->process = &p3;
+   
+    request(1,1,nd2);
+    request(1,1,nd);
+    request(1,1,nd3);
 
     print_PCB_res_list(p1.other_resources);
-    free_res_held_by_PCB(nd);
+    
+   // free_res_held_by_PCB(nd);
+    delete_node(nd);
+    print_RCB_waitList(res1.waitList);
 
     printf("after first call to free_res_held_by_PCB()\n");
 
-    print_PCB_res_list(p1.other_resources);
+//    print_PCB_res_list(p1.other_resources);
 }
 
 void test_child_linking()
@@ -206,7 +245,8 @@ void test_remove_RL_add_WL()
 int main()
 {
     init_resources();
-    test_free_all_res_held_by_PCB();
+    test_remove_first_process_on_blocked_list();
+//    test_free_all_res_held_by_PCB();
 //    test_child_linking();
 //    test_find_ready_PCB();
 //    test_remove_RCB_from_PCB();

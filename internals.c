@@ -252,6 +252,7 @@ void remove_PCB_from_RL(PCB_node * proc)
 void remove_PCB_from_waitList(PCB_node ** waitList, char * pid)
 {
     PCB_node * trav = *waitList;
+    PCB_node * tmp;
     if(trav != NULL)
     {
         if(strcmp(trav->process->pid, pid) == 0)
@@ -264,7 +265,12 @@ void remove_PCB_from_waitList(PCB_node ** waitList, char * pid)
 	    while(trav->next != NULL && strcmp(pid, trav->next->process->pid) != 0)
 	        trav = trav->next;
 	    if(strcmp(pid, trav->next->process->pid) == 0)
+            {
+		tmp = trav->next;
 	        trav->next = trav->next->next;
+		tmp->next = NULL;
+	    }
+	    
 	}
     }
 }
@@ -345,11 +351,11 @@ int request(int rid, int n, PCB_node * activeProc)
     else
     {
         activeProc->process->status_type = BLOCKED;
-        activeProc->process->list = res->waitList; 
         // remove self from readyList
         remove_PCB_from_RL(activeProc);
         // add self to res waitList
         add_PCB_to_waitList(activeProc, res);
+        activeProc->process->list = res->waitList; 
     }   
  
 
@@ -482,5 +488,27 @@ void free_res_held_by_PCB(PCB_node * proc)
         printf("resource found with rid %d and count %d\n", res->resource->rid, res->num);
 	release(res->resource->rid, res->num, proc);
 	res = proc->process->other_resources;
+    }
+}
+
+void delete_node(PCB_node * nd)
+{
+    free_res_held_by_PCB(nd);
+    if(nd->process->status_type == READY)
+    {
+        printf("process is ready\n");
+	remove_PCB_from_RL(nd);
+    }
+    else
+    {
+        printf("process is blocked\n");
+	if(nd->process->list == res1.waitList)
+	    remove_PCB_from_waitList(&res1.waitList,  nd->process->pid);
+	else if(nd->process->list == res2.waitList)
+	    remove_PCB_from_waitList(&res2.waitList,  nd->process->pid);
+	else if(nd->process->list == res3.waitList)
+	    remove_PCB_from_waitList(&res3.waitList,  nd->process->pid);
+	else if(nd->process->list == res4.waitList)
+	    remove_PCB_from_waitList(&res4.waitList,  nd->process->pid);
     }
 }
