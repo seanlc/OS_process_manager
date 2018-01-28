@@ -473,3 +473,14 @@ int release(int rid, int n, PCB_node * activeProc)
     // call Scheduler()
     return 1;    
 }
+
+void free_res_held_by_PCB(PCB_node * proc)
+{
+    RCB_node * res = proc->process->other_resources;
+    while(res != NULL)
+    {
+        printf("resource found with rid %d and count %d\n", res->resource->rid, res->num);
+	release(res->resource->rid, res->num, proc);
+	res = proc->process->other_resources;
+    }
+}

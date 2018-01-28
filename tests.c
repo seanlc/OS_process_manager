@@ -1,6 +1,25 @@
 #include "stdio.h"
 #include "internals.c"
 
+void test_free_all_res_held_by_PCB()
+{
+    PCB_node * nd = (PCB_node *) malloc(sizeof(PCB_node));
+    nd->next = NULL;
+    PCB  p1 = Create("p1",1, NULL);
+    nd->process = &p1;
+
+    request(1,1,nd);
+    request(2,2,nd);
+    request(3,3,nd);
+
+    print_PCB_res_list(p1.other_resources);
+    free_res_held_by_PCB(nd);
+
+    printf("after first call to free_res_held_by_PCB()\n");
+
+    print_PCB_res_list(p1.other_resources);
+}
+
 void test_child_linking()
 {
     PCB_node * nd = (PCB_node *) malloc(sizeof(PCB_node));
@@ -20,6 +39,8 @@ void test_child_linking()
     nd3->process = &p3;
     
     PCB_info(nd);
+
+    PCB_info(nd2);
 }
 
 void test_find_ready_PCB()
@@ -185,7 +206,8 @@ void test_remove_RL_add_WL()
 int main()
 {
     init_resources();
-    test_child_linking();
+    test_free_all_res_held_by_PCB();
+//    test_child_linking();
 //    test_find_ready_PCB();
 //    test_remove_RCB_from_PCB();
 //    test_release();
