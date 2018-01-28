@@ -491,6 +491,26 @@ void free_res_held_by_PCB(PCB_node * proc)
     }
 }
 
+void remove_PCB_entry_from_PL(PCB_node * nd)
+{
+    int index = numProc;
+    for(int i = 0; i < numProc; ++i)
+    {
+        if(procList[i] == nd->process)
+	{
+	    index = i;
+	    break;
+	}
+    }
+    if(index != numProc)
+    {
+        for(int i = index; i < numProc-1; ++i)
+            procList[i] = procList[i-1];
+	procList[numProc-1] = NULL;
+	--numProc;
+    }
+}
+
 void delete_node(PCB_node * nd)
 {
     free_res_held_by_PCB(nd);
@@ -511,4 +531,24 @@ void delete_node(PCB_node * nd)
 	else if(nd->process->list == res4.waitList)
 	    remove_PCB_from_waitList(&res4.waitList,  nd->process->pid);
     }
+    remove_PCB_entry_from_PL(nd);
+    free(nd->process);
+    free(nd);
 }
+
+void kill_tree(PCB_node * nd)
+{
+    if(nd->next_sib == NULL)
+        delete_node(nd);
+    else
+    {
+        kill_tree(nd->next_sib);
+	delete_node(nd);
+    }
+}
+
+void destroy_process(char * pid)
+{
+
+}
+

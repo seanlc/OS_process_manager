@@ -1,6 +1,30 @@
 #include "stdio.h"
 #include "internals.c"
 
+void test_delete_node()
+{
+    PCB_node * nd2 = (PCB_node *) malloc(sizeof(PCB_node));
+    nd2->next = NULL;
+    PCB  p2 = Create("p2",1, NULL);
+    nd2->process = &p2;
+
+    PCB_node * nd = (PCB_node *) malloc(sizeof(PCB_node));
+    nd->next = NULL;
+    PCB  p1 = Create("p1",1, nd2);
+    nd->process = &p1;
+
+    PCB_node * nd3 = (PCB_node *) malloc(sizeof(PCB_node));
+    nd3->next = NULL;
+    PCB  p3 = Create("p3",1, nd2);
+    nd3->process = &p3;
+
+    print_PL();
+
+    kill_tree(nd2->process->children);
+
+    print_PL();
+}
+
 void test_remove_first_process_on_blocked_list()
 {
     PCB_node * nd2 = (PCB_node *) malloc(sizeof(PCB_node));
@@ -245,7 +269,8 @@ void test_remove_RL_add_WL()
 int main()
 {
     init_resources();
-    test_remove_first_process_on_blocked_list();
+    test_delete_node();
+//    test_remove_first_process_on_blocked_list();
 //    test_free_all_res_held_by_PCB();
 //    test_child_linking();
 //    test_find_ready_PCB();
