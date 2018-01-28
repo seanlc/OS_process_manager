@@ -22,7 +22,7 @@ typedef struct
     struct RCB_node * other_resources;		// resources currenly held by process    
     status status_type;  			// ready, running, or blocked
     struct PCB_node * list;			// ready list or resource wait list
-    struct PCB * parent;			// points to parent process
+    struct PCB_node * parent;			// points to parent process
     struct PCB_node * children;			// llist pointers to child PCBs
     int priority;				// 0-init 1-user 2-system
 } PCB;
@@ -33,6 +33,7 @@ PCB_node
     PCB * process;
     int num_req;
     struct PCB_node * next;
+    struct PCB_node * next_sib;
     
 } PCB_node;
 
@@ -70,8 +71,53 @@ void add_to_RL(struct PCB_node * process, int priority)
     }
 }
 
+void add_to_child_link_of_parent(struct PCB_node * par, PCB_node * child)
+{
+    PCB_node * trav = par;
+    if(par->process->children == NULL)
+    {
+        // head insertion
+	par->process->children = child;
+    }
+    else
+    {
+	while(trav->process->children->next_sib != NULL)
+	    trav = trav->process->children->next_sib;
+	trav->process->children->next_sib = child;
+    }
+}
+void print_PCB_res_list(RCB_node * lst)
+{
+    printf("process holds: \n");
+    RCB_node * trav = lst;
+    while(trav != NULL)
+    {
+        printf("resource %d count %d\n", trav->resource->rid, trav->num);
+        trav = trav->next;
+    }
+}
 
-PCB Create(char * name, int priority, struct PCB * activeProc)
+void PCB_info(PCB_node * nd)
+{
+    printf("pid: %s\n", nd->process->pid);
+    print_PCB_res_list(nd->process->other_resources);
+    printf("status: %d\n", nd->process->status_type);
+    if(nd->process->parent != NULL)
+	printf("parent pid: %s\n", nd->process->parent->process->pid);
+    PCB_node * trav = nd->process->children;
+    if(trav != NULL)
+    {
+        printf("children: \n");
+        while(trav != NULL)
+	{
+	    printf("pid: %s\n", trav->process->pid);
+	    trav = trav->next_sib;
+	}	
+    }
+}
+
+// TODO add to child link of parent
+PCB Create(char * name, int priority, struct PCB_node * activeProc)
 {
     // allocate PCB_node
     PCB_node * pNode = (PCB_node *) malloc(sizeof(PCB_node));
@@ -79,6 +125,7 @@ PCB Create(char * name, int priority, struct PCB * activeProc)
     // populate PCB_node
     // allocate PCB
     pNode->process = (PCB *) malloc(sizeof(PCB));
+    pNode->next_sib = NULL;
     pNode->next = NULL;
 
     PCB * curProc = pNode->process;
@@ -92,7 +139,11 @@ PCB Create(char * name, int priority, struct PCB * activeProc)
     curProc->parent = activeProc;
     curProc->children = NULL;
     curProc->priority = priority;
-    
+   
+    // add to child link of parent
+    if(activeProc != NULL)
+        add_to_child_link_of_parent(activeProc, pNode);
+
     // add to ready list
     add_to_RL(pNode, priority);
     
@@ -306,16 +357,6 @@ int request(int rid, int n, PCB_node * activeProc)
     return 1;
 }
 
-void print_PCB_res_list(RCB_node * lst)
-{
-    printf("process holds: \n");
-    RCB_node * trav = lst;
-    while(trav != NULL)
-    {
-        printf("resource %d count %d\n", trav->resource->rid, trav->num);
-        trav = trav->next;
-    }
-}
 
 void print_RCB_waitList(PCB_node * lst)
 {

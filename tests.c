@@ -1,6 +1,27 @@
 #include "stdio.h"
 #include "internals.c"
 
+void test_child_linking()
+{
+    PCB_node * nd = (PCB_node *) malloc(sizeof(PCB_node));
+    nd->next = NULL;
+    PCB  p1 = Create("p1",1, NULL);
+    nd->process = &p1;
+
+    
+    PCB_node * nd2 = (PCB_node *) malloc(sizeof(PCB_node));
+    nd2->next = NULL;
+    PCB  p2 = Create("p2",1, nd);
+    nd2->process = &p2;
+    
+    PCB_node * nd3 = (PCB_node *) malloc(sizeof(PCB_node));
+    nd3->next = NULL;
+    PCB  p3 = Create("p3",1, nd);
+    nd3->process = &p3;
+    
+    PCB_info(nd);
+}
+
 void test_find_ready_PCB()
 {
     PCB_node * nd = (PCB_node *) malloc(sizeof(PCB_node));
@@ -164,7 +185,8 @@ void test_remove_RL_add_WL()
 int main()
 {
     init_resources();
-    test_find_ready_PCB();
+    test_child_linking();
+//    test_find_ready_PCB();
 //    test_remove_RCB_from_PCB();
 //    test_release();
 //    test_request();
