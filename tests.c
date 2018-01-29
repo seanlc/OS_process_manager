@@ -8,22 +8,13 @@ void test_delete_node()
     PCB  p2 = Create("p2",1, NULL);
     nd2->process = &p2;
 
-    PCB_node * nd = (PCB_node *) malloc(sizeof(PCB_node));
-    nd->next = NULL;
     PCB  p1 = Create("p1",1, nd2);
-    nd->process = &p1;
 
-    PCB_node * nd3 = (PCB_node *) malloc(sizeof(PCB_node));
-    nd3->next = NULL;
     PCB  p3 = Create("p3",1, nd2);
-    nd3->process = &p3;
 
     print_PL();
     
     destroy_process(nd2);
-    free(nd);
-    free(nd3);
-//    kill_tree(nd2->process->children);
 
     print_PL();
 }
