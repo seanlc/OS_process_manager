@@ -19,8 +19,11 @@ void test_delete_node()
     nd3->process = &p3;
 
     print_PL();
-
-    kill_tree(nd2->process->children);
+    
+    destroy_process(nd2);
+    free(nd);
+    free(nd3);
+//    kill_tree(nd2->process->children);
 
     print_PL();
 }

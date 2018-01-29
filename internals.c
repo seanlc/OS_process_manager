@@ -46,7 +46,7 @@ RCB_node
 } RCB_node;
 
 //list of all active processes
-PCB * procList[50];
+PCB_node * procList[50];
 int numProc = 0;
 
 // resources
@@ -148,7 +148,7 @@ PCB Create(char * name, int priority, struct PCB_node * activeProc)
     add_to_RL(pNode, priority);
     
     //add to proclist
-    procList[numProc++] = curProc;
+    procList[numProc++] = pNode;
     // TODO call scheduler
     // take out return statement and change type
     return *(pNode->process);
@@ -176,7 +176,7 @@ void print_PL()
     printf("ALL PROCESSES: \n");
     for(int i = 0; i < numProc; ++i)
     {
-        printf("process: %s ", procList[i]->pid);
+        printf("process: %s ", procList[i]->process->pid);
     }
     printf("\n");
 }
@@ -185,8 +185,8 @@ PCB * get_ptr_of_pid(char * name)
 {
     for(int i = 0; i < numProc; ++i)
     {
-        if(strcmp(procList[i]->pid, name) == 0)
-            return procList[i];
+        if(strcmp(procList[i]->process->pid, name) == 0)
+            return procList[i]->process;
     }
     return NULL;    
 }
@@ -496,16 +496,19 @@ void remove_PCB_entry_from_PL(PCB_node * nd)
     int index = numProc;
     for(int i = 0; i < numProc; ++i)
     {
-        if(procList[i] == nd->process)
+        if(procList[i]->process == nd->process)
 	{
 	    index = i;
 	    break;
 	}
     }
-    if(index != numProc)
+    if(1)
     {
         for(int i = index; i < numProc-1; ++i)
             procList[i] = procList[i-1];
+        free(procList[numProc-1]->process->pid);
+        free(procList[numProc-1]->process);
+	free(procList[numProc-1]);
 	procList[numProc-1] = NULL;
 	--numProc;
     }
@@ -532,8 +535,19 @@ void delete_node(PCB_node * nd)
 	    remove_PCB_from_waitList(&res4.waitList,  nd->process->pid);
     }
     remove_PCB_entry_from_PL(nd);
+    free(nd->process->pid);
     free(nd->process);
     free(nd);
+}
+
+PCB_node * get_PCB_node_from_PL(char * pid)
+{
+    for(int i = 0; i < numProc; ++i)
+    {
+        if(strcmp(procList[i]->process->pid, pid) == 0)
+            return procList[i];	
+    }
+    return NULL;
 }
 
 void kill_tree(PCB_node * nd)
@@ -547,8 +561,11 @@ void kill_tree(PCB_node * nd)
     }
 }
 
-void destroy_process(char * pid)
+void destroy_process(PCB_node * nd)
 {
-
+    PCB_node * proc = nd;
+    if(proc->process->children != NULL)
+        kill_tree(proc->process->children);
+    delete_node(proc);
 }
 
