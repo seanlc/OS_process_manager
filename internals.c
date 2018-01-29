@@ -561,11 +561,27 @@ void kill_tree(PCB_node * nd)
     }
 }
 
+
+
 void destroy_process(PCB_node * nd)
 {
     PCB_node * proc = nd;
     if(proc->process->children != NULL)
         kill_tree(proc->process->children);
     delete_node(proc);
+}
+
+PCB_node *  get_highest_pri_proc()
+{
+    PCB_node * trav;
+    for(int i = 2; i > -1; --i )
+    {
+        trav = readyList[i];
+	if(trav == NULL)
+	    continue;
+	else
+	    return trav;
+    }
+    return NULL;
 }
 

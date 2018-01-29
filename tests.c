@@ -8,9 +8,9 @@ void test_delete_node()
     PCB  p2 = Create("p2",1, NULL);
     nd2->process = &p2;
 
-    PCB  p1 = Create("p1",1, nd2);
+    Create("p1",1, nd2);
 
-    PCB  p3 = Create("p3",1, nd2);
+    Create("p3",1, nd2);
 
     print_PL();
     
