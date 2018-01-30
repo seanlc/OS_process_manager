@@ -290,11 +290,58 @@ void test_get_running_proc()
     printf("The running process is %s\n", cur->process->pid);
 }
 
+void test_delete_first_child_of_mult_sibs()
+{
+    PCB_node * init = (PCB_node * ) malloc(sizeof(PCB_node));
+    init->next = NULL;
+    PCB initial = Create("init", 0, NULL);
+    init->process = &initial;
+
+    Create("p1",1,init);
+    Create("p2", 2, init);
+    Create("p3",2,init);
+    Create("p4",1,init);
+
+    print_RL();
+
+//    destroy_process()
+}
+
+void test_get_PCB_node_by_pid()
+{
+    PCB_node * init = (PCB_node * ) malloc(sizeof(PCB_node));
+    init->next = NULL;
+    PCB initial = Create("init", 0, NULL);
+    init->process = &initial;
+
+    Create("p1",1,init);
+    Create("p2", 2, init);
+    Create("p3",2,init);
+    Create("p4",1,init);
+   
+    request(1,1,get_PCB_node_by_pid("p3"));    
+
+    request(1,1,get_PCB_node_by_pid("p2"));    
+
+    printf("waiting list for res1\n");
+    print_RCB_waitList(res1.waitList);
+
+    print_RL();
+
+    PCB_node * found_PCB = get_PCB_node_by_pid("p2");
+    if(found_PCB != NULL)
+        printf("found PCB_node with process pid: %s\n", found_PCB->process->pid);
+    else
+        printf("nothing found\n");
+
+}
 
 int main()
 {
     init_resources();
-    test_get_running_proc();
+    test_get_PCB_node_by_pid();
+//    test_delete_first_child_of_mult_sibs();
+//    test_get_running_proc();
 //    test_scheduler();
 //    test_get_highest_pri_proc();
 //    test_delete_node();

@@ -571,16 +571,6 @@ void delete_node(PCB_node * nd)
     free(nd);
 }
 
-PCB_node * get_PCB_node_from_PL(char * pid)
-{
-    for(int i = 0; i < numProc; ++i)
-    {
-        if(strcmp(procList[i]->process->pid, pid) == 0)
-            return procList[i];	
-    }
-    return NULL;
-}
-
 void kill_tree(PCB_node * nd)
 {
     if(nd->next_sib == NULL)
@@ -591,8 +581,6 @@ void kill_tree(PCB_node * nd)
 	delete_node(nd);
     }
 }
-
-
 
 void destroy_process(PCB_node * nd)
 {
@@ -619,4 +607,59 @@ PCB_node * get_running_proc()
     return trav;
 }
 
+
+RCB * get_RCB_node_by_pid(int n)
+{
+    RCB * rNode = NULL;
+    switch(n)
+    {
+        case 1:
+	    rNode = &res1;
+	    break;
+	case 2:
+	    rNode = &res2;
+	    break;
+	case 3:
+	    rNode = &res3;
+	    break;
+	case 4:
+	    rNode = &res4;
+	    break;
+    }
+    return rNode;
+}
+
+PCB_node * get_PCB_node_by_pid(char * pid)
+{
+    PCB_node * trav = NULL;
+
+    // look on readyList
+    for(int i = 0; i < 3; ++i)
+    {
+        trav = readyList[i];
+        while(trav != NULL)
+        {
+	    if(strcmp(trav->process->pid, pid) == 0)
+                return trav;
+	    trav = trav->next;
+	}
+    }
+
+    // look on resource waitList
+    
+    RCB * res = NULL;
+    for(int i = 1; i < 5; ++i)
+    {
+        res = get_RCB_node_by_pid(i);
+	trav = res->waitList;
+	while(trav != NULL)
+	{
+	    if(strcmp(trav->process->pid, pid) == 0)
+	        return trav;
+	    trav = trav->next;
+	}
+    }
+
+    return NULL;
+}
 
