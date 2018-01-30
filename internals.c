@@ -2,6 +2,8 @@
 #include "stdlib.h"
 #include "string.h"
 
+#define MAX_CHILDREN 20
+
 typedef enum {RUNNING = 1, READY = 2, BLOCKED = 3} status;
 
 // ready list
@@ -23,7 +25,8 @@ typedef struct
     status status_type;  			// ready, running, or blocked
     struct PCB_node * list;			// ready list or resource wait list
     struct PCB_node * parent;			// points to parent process
-    struct PCB_node * children;			// llist pointers to child PCBs
+    struct PCB_node * children[MAX_CHILDREN];	// array pointers to child PCBs
+    int numChildren;				// number of children
     int priority;				// 0-init 1-user 2-system
 } PCB;
 
@@ -71,22 +74,6 @@ void add_to_RL(struct PCB_node * process, int priority)
     }
 }
 
-void add_to_child_link_of_parent(struct PCB_node * par, PCB_node * child)
-{
-    PCB_node * trav = par;
-    if(par->process->children == NULL)
-    {
-        // head insertion
-	par->process->children = child;
-    }
-    else
-    {
-	trav = trav->process->children;
-	while(trav->next_sib != NULL)
-	    trav = trav->next_sib;
-	trav->next_sib = child;
-    }
-}
 void print_PCB_res_list(RCB_node * lst)
 {
     printf("process holds: \n");
@@ -105,16 +92,6 @@ void PCB_info(PCB_node * nd)
     printf("status: %d\n", nd->process->status_type);
     if(nd->process->parent != NULL)
 	printf("parent pid: %s\n", nd->process->parent->process->pid);
-    PCB_node * trav = nd->process->children;
-    if(trav != NULL)
-    {
-        printf("children: \n");
-        while(trav != NULL)
-	{
-	    printf("pid: %s\n", trav->process->pid);
-	    trav = trav->next_sib;
-	}	
-    }
 }
 PCB_node *  get_highest_pri_proc()
 {
@@ -167,12 +144,12 @@ PCB Create(char * name, int priority, struct PCB_node * activeProc)
     curProc->status_type = READY;
     curProc->list = readyList[priority];
     curProc->parent = activeProc;
-    curProc->children = NULL;
+    curProc->numChildren = 0;
+    for(int i =0; i < MAX_CHILDREN; ++i)
+        curProc->children[i] = NULL;
     curProc->priority = priority;
    
     // add to child link of parent
-    if(activeProc != NULL)
-        add_to_child_link_of_parent(activeProc, pNode);
 
     // add to ready list
     add_to_RL(pNode, priority);
@@ -585,8 +562,8 @@ void kill_tree(PCB_node * nd)
 void destroy_process(PCB_node * nd)
 {
     PCB_node * proc = nd;
-    if(proc->process->children != NULL)
-        kill_tree(proc->process->children);
+//    if(proc->process->children != NULL)
+//        kill_tree(proc->process->children);
     delete_node(proc);
     Scheduler(nd);
 }

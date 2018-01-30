@@ -304,7 +304,12 @@ void test_delete_first_child_of_mult_sibs()
 
     print_RL();
 
-//    destroy_process()
+    printf("before call to destroy_process()\n");
+    destroy_process(get_PCB_node_by_pid("p3"));
+    printf("after call\n");
+
+    print_RL();
+
 }
 
 void test_get_PCB_node_by_pid()
@@ -318,9 +323,11 @@ void test_get_PCB_node_by_pid()
     Create("p2", 2, init);
     Create("p3",2,init);
     Create("p4",1,init);
-   
+
+    printf("p3 requests 1 of res1\n");   
     request(1,1,get_PCB_node_by_pid("p3"));    
 
+    printf("p2 requests 1 of res1\n");
     request(1,1,get_PCB_node_by_pid("p2"));    
 
     printf("waiting list for res1\n");
