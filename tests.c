@@ -1,6 +1,19 @@
 #include "stdio.h"
 #include "internals.c"
 
+void test_scheduler()
+{
+    Create("p1", 1, NULL);
+}
+void test_get_highest_pri_proc()
+{
+    Create("p1", 2, NULL);
+    Create("p2", 1, NULL);
+    Create("p3", 0, NULL);
+
+    PCB_node * nd = get_highest_pri_proc();
+    printf("found process with pid: %s\n", nd->process->pid);
+}
 void test_delete_node()
 {
     PCB_node * nd2 = (PCB_node *) malloc(sizeof(PCB_node));
@@ -109,7 +122,7 @@ void test_find_ready_PCB()
 
     PCB_node * nd2 = (PCB_node *) malloc(sizeof(PCB_node));
     nd2->next = NULL;
-    PCB  p2 = Create("p2",1, NULL);
+    PCB  p2 = Create("p2",2, NULL);
     nd2->process = &p2;
 
     PCB_node * nd3 = (PCB_node *) malloc(sizeof(PCB_node));
@@ -168,7 +181,9 @@ void test_request()
     nd->next = NULL;
     PCB  p1 = Create("p1",1, NULL);
     nd->process = &p1;
-    
+
+    Create("p2", 1, NULL);
+
     request(1,1,nd);
     print_PCB_res_list(p1.other_resources);
     printf("number of r1 remaining: %d\n", res1.u);
@@ -259,11 +274,30 @@ void test_remove_RL_add_WL()
     print_RL();
 }
 
+void test_get_running_proc()
+{
+    PCB_node * init = (PCB_node * ) malloc(sizeof(PCB_node));
+    init->next = NULL;
+    PCB initial = Create("init", 0, NULL);
+    init->process = &initial;
+
+    Create("p1",1,init);
+    Create("p2", 2, init);
+    Create("p3",2,init);
+    Create("p4",1,init);
+
+    PCB_node * cur = get_running_proc();
+    printf("The running process is %s\n", cur->process->pid);
+}
+
 
 int main()
 {
     init_resources();
-    test_delete_node();
+    test_get_running_proc();
+//    test_scheduler();
+//    test_get_highest_pri_proc();
+//    test_delete_node();
 //    test_remove_first_process_on_blocked_list();
 //    test_free_all_res_held_by_PCB();
 //    test_child_linking();

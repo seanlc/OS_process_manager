@@ -81,9 +81,10 @@ void add_to_child_link_of_parent(struct PCB_node * par, PCB_node * child)
     }
     else
     {
-	while(trav->process->children->next_sib != NULL)
-	    trav = trav->process->children->next_sib;
-	trav->process->children->next_sib = child;
+	trav = trav->process->children;
+	while(trav->next_sib != NULL)
+	    trav = trav->next_sib;
+	trav->next_sib = child;
     }
 }
 void print_PCB_res_list(RCB_node * lst)
@@ -114,6 +115,35 @@ void PCB_info(PCB_node * nd)
 	    trav = trav->next_sib;
 	}	
     }
+}
+PCB_node *  get_highest_pri_proc()
+{
+    PCB_node * trav;
+    for(int i = 2; i > -1; --i )
+    {
+        trav = readyList[i];
+	if(trav == NULL)
+	    continue;
+	else
+	    return trav;
+    }
+    return NULL;
+}
+
+void preempt(PCB_node * new, PCB_node * old)
+{
+    new->process->status_type = RUNNING;
+    if(old != NULL && old->process->status_type == RUNNING)
+        old->process->status_type = READY;
+    printf("Process %s is now running\n", new->process->pid);
+}
+void Scheduler(PCB_node * activeProc)
+{
+    PCB_node * pNode = get_highest_pri_proc();
+    if(pNode == NULL)
+        printf("There is no process to run\n");
+    else if(activeProc == NULL || activeProc->process->priority < pNode->process->priority || activeProc->process->status_type != RUNNING)
+        preempt(pNode, activeProc);
 }
 
 // TODO add to child link of parent
@@ -149,7 +179,7 @@ PCB Create(char * name, int priority, struct PCB_node * activeProc)
     
     //add to proclist
     procList[numProc++] = pNode;
-    // TODO call scheduler
+    Scheduler(activeProc);
     // take out return statement and change type
     return *(pNode->process);
 }
@@ -359,7 +389,8 @@ int request(int rid, int n, PCB_node * activeProc)
     }   
  
 
-    // call Scheduler()
+    Scheduler(activeProc);
+
     return 1;
 }
 
@@ -476,7 +507,7 @@ int release(int rid, int n, PCB_node * activeProc)
 	}
     }  
 
-    // call Scheduler()
+    Scheduler(activeProc);
     return 1;    
 }
 
@@ -569,19 +600,23 @@ void destroy_process(PCB_node * nd)
     if(proc->process->children != NULL)
         kill_tree(proc->process->children);
     delete_node(proc);
+    Scheduler(nd);
 }
 
-PCB_node *  get_highest_pri_proc()
+PCB_node * get_running_proc()
 {
-    PCB_node * trav;
-    for(int i = 2; i > -1; --i )
+    PCB_node * trav = NULL;
+    for(int i = 2; i > -1; --i)
     {
         trav = readyList[i];
-	if(trav == NULL)
-	    continue;
-	else
-	    return trav;
+	while(trav != NULL)
+	{
+	    if(trav->process->status_type == RUNNING)
+	        return trav;
+	    trav = trav->next;
+	}
     }
-    return NULL;
+    return trav;
 }
+
 
