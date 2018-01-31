@@ -57,7 +57,7 @@ void test_delete_node()
 
     print_PL();
     
-    destroy_process(get_PCB_node_by_pid("p5"));
+    destroy_process(get_PCB_node_by_pid("p1"));
 
     print_PL();
 

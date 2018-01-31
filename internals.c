@@ -521,7 +521,7 @@ void free_res_held_by_PCB(PCB_node * proc)
 void delete_node(PCB_node * nd)
 {
     free_res_held_by_PCB(nd);
-    if(nd->process->status_type == READY)
+    if(nd->process->status_type == READY || nd->process->status_type == RUNNING)
     {
 	remove_PCB_from_RL(nd);
     }
@@ -548,11 +548,9 @@ void destroy_process(PCB_node * nd)
 {
     PCB_node * proc = nd;
     for(int i = 0; i < nd->process->numChildren; ++i)
-    {
         destroy_process(nd->process->children[i]);
-    }
     delete_node(proc);
-    Scheduler(nd);
+    Scheduler(NULL);
 }
 
 PCB_node * get_running_proc()
