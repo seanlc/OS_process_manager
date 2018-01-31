@@ -48,10 +48,6 @@ RCB_node
     struct RCB_node * next;
 } RCB_node;
 
-//list of all active processes
-PCB_node * procList[50];
-int numProc = 0;
-
 // resources
 RCB res1;
  
@@ -146,7 +142,6 @@ void Scheduler(PCB_node * activeProc)
         preempt(pNode, activeProc);
 }
 
-// TODO add to child link of parent
 PCB Create(char * name, int priority, struct PCB_node * activeProc)
 {
     // allocate PCB_node
@@ -179,8 +174,6 @@ PCB Create(char * name, int priority, struct PCB_node * activeProc)
     // add to ready list
     add_to_RL(pNode, priority);
     
-    //add to proclist
-    procList[numProc++] = pNode;
     Scheduler(activeProc);
     // take out return statement and change type
     return *(pNode->process);
@@ -203,7 +196,7 @@ void print_blocked_procs()
     for(int i = 1; i < 5; ++i)
     {
         res = get_RCB_ptr_by_pid(i);
-	printf("resource %d: ", i);
+	printf("resource %d:\t", i);
 	print_RCB_waitList(res->waitList);
         printf("\n");
     }
@@ -232,16 +225,6 @@ void print_PL()
     print_RL();
     print_blocked_procs();
     printf("\n");
-}
-
-PCB * get_ptr_of_pid(char * name)
-{
-    for(int i = 0; i < numProc; ++i)
-    {
-        if(strcmp(procList[i]->process->pid, name) == 0)
-            return procList[i]->process;
-    }
-    return NULL;    
 }
 
 void init_resources()
@@ -534,28 +517,6 @@ void free_res_held_by_PCB(PCB_node * proc)
     }
 }
 
-void remove_PCB_entry_from_PL(PCB_node * nd)
-{
-    int index = numProc;
-    for(int i = 0; i < numProc; ++i)
-    {
-        if(procList[i]->process == nd->process)
-	{
-	    index = i;
-	    break;
-	}
-    }
-    if(1)
-    {
-        for(int i = index; i < numProc-1; ++i)
-            procList[i] = procList[i-1];
-        free(procList[numProc-1]->process->pid);
-        free(procList[numProc-1]->process);
-	free(procList[numProc-1]);
-	procList[numProc-1] = NULL;
-	--numProc;
-    }
-}
 
 void delete_node(PCB_node * nd)
 {
@@ -575,7 +536,6 @@ void delete_node(PCB_node * nd)
 	else if(nd->process->list == res4.waitList)
 	    remove_PCB_from_waitList(&res4.waitList,  nd->process->pid);
     }
-    remove_PCB_entry_from_PL(nd);
     // TODO
     // if parent != NULL
     // remove from parent child array
