@@ -191,7 +191,7 @@ void print_RCB_waitList(PCB_node * lst)
     PCB_node * trav = lst;
     while(trav != NULL)
     {
-        printf("process: %s\n", trav->process->pid);
+        printf("process: %s\t", trav->process->pid);
         trav = trav->next;
     }
 }
@@ -203,8 +203,9 @@ void print_blocked_procs()
     for(int i = 1; i < 5; ++i)
     {
         res = get_RCB_ptr_by_pid(i);
-	printf("resource %d: \n", i);
-	    print_RCB_waitList(res->waitList);
+	printf("resource %d: ", i);
+	print_RCB_waitList(res->waitList);
+        printf("\n");
     }
 }
 
@@ -214,11 +215,11 @@ void print_RL()
     printf("READY LIST: \n");
     for(int i = 0; i < 3; ++i)
     {
-        printf("priority %d: ", i);
+        printf("priority %d:\t", i);
         trav = readyList[i];
         while(trav != NULL)
         {
-            printf("process: %s ", trav->process->pid);
+            printf("process: %s \t", trav->process->pid);
             trav = trav->next;
         }
         printf("\n");
@@ -330,8 +331,6 @@ void remove_PCB_from_waitList(PCB_node ** waitList, char * pid)
 void add_PCB_to_waitList(PCB_node * proc, RCB * res)
 {
     PCB_node * trav = res->waitList;
-
-    printf("number of resources requrested by process: %d\n", proc->num_req);
 
     if(trav == NULL)
         res->waitList = proc;
@@ -563,12 +562,10 @@ void delete_node(PCB_node * nd)
     free_res_held_by_PCB(nd);
     if(nd->process->status_type == READY)
     {
-        printf("process is ready\n");
 	remove_PCB_from_RL(nd);
     }
     else
     {
-        printf("process is blocked\n");
 	if(nd->process->list == res1.waitList)
 	    remove_PCB_from_waitList(&res1.waitList,  nd->process->pid);
 	else if(nd->process->list == res2.waitList)
