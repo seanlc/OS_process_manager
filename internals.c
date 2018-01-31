@@ -517,6 +517,19 @@ void free_res_held_by_PCB(PCB_node * proc)
     }
 }
 
+void remove_child_from_parent(PCB_node * par, PCB_node * child)
+{
+    int numChildren = par->process->numChildren;
+    int found = 0;
+    for(int i = 0; i < numChildren; ++i)
+    {
+        if(! found && strcmp(par->process->children[i]->process->pid, child->process->pid) == 0)
+	    found = 1;
+	if(found)
+	    par->process->children[i] = par->process->children[i + 1];
+    }
+    --par->process->numChildren;
+}
 
 void delete_node(PCB_node * nd)
 {
@@ -536,9 +549,11 @@ void delete_node(PCB_node * nd)
 	else if(nd->process->list == res4.waitList)
 	    remove_PCB_from_waitList(&res4.waitList,  nd->process->pid);
     }
-    // TODO
-    // if parent != NULL
+    
     // remove from parent child array
+    if(nd->process->parent != NULL)
+        remove_child_from_parent(nd->process->parent, nd);
+
     free(nd->process->pid);
     free(nd->process);
     free(nd);
