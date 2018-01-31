@@ -531,6 +531,19 @@ void remove_child_from_parent(PCB_node * par, PCB_node * child)
     --par->process->numChildren;
 }
 
+void remove_from_res_waitList(PCB_node * nd)
+{
+    if(nd->process->list == res1.waitList)
+	remove_PCB_from_waitList(&res1.waitList,  nd->process->pid);
+    else if(nd->process->list == res2.waitList)
+	remove_PCB_from_waitList(&res2.waitList,  nd->process->pid);
+    else if(nd->process->list == res3.waitList)
+	remove_PCB_from_waitList(&res3.waitList,  nd->process->pid);
+    else if(nd->process->list == res4.waitList)
+	remove_PCB_from_waitList(&res4.waitList,  nd->process->pid);
+}
+
+
 void delete_node(PCB_node * nd)
 {
     free_res_held_by_PCB(nd);
@@ -540,14 +553,7 @@ void delete_node(PCB_node * nd)
     }
     else
     {
-	if(nd->process->list == res1.waitList)
-	    remove_PCB_from_waitList(&res1.waitList,  nd->process->pid);
-	else if(nd->process->list == res2.waitList)
-	    remove_PCB_from_waitList(&res2.waitList,  nd->process->pid);
-	else if(nd->process->list == res3.waitList)
-	    remove_PCB_from_waitList(&res3.waitList,  nd->process->pid);
-	else if(nd->process->list == res4.waitList)
-	    remove_PCB_from_waitList(&res4.waitList,  nd->process->pid);
+        remove_from_res_waitList(nd);
     }
     
     // remove from parent child array
@@ -562,7 +568,7 @@ void delete_node(PCB_node * nd)
 void destroy_process(PCB_node * nd)
 {
     PCB_node * proc = nd;
-    for(int i = 0; i < nd->process->numChildren; ++i)
+    for(int i = nd->process->numChildren-1; i > -1; --i)
         destroy_process(nd->process->children[i]);
     delete_node(proc);
     Scheduler(NULL);
@@ -628,3 +634,6 @@ void print_children(PCB_node * nd)
         printf("process %s\n", nd->process->children[i]->process->pid);
     }
 }
+
+//TODO
+void Timeout();

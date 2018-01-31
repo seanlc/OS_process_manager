@@ -27,14 +27,17 @@ void test_children_list_after_delete()
     request(1,1, get_PCB_node_by_pid("p8"));
 
     print_PL();
-
-    print_children(get_PCB_node_by_pid("p6"));
-
-    destroy_process(get_PCB_node_by_pid("p8"));
-
+    
+    
+    destroy_process(get_PCB_node_by_pid("p6"));
+    destroy_process(get_PCB_node_by_pid("p1"));
+        
     print_PL();
 
-    print_children(get_PCB_node_by_pid("p6"));
+    free(init->process->pid);
+    free(init->process);
+    free(init);
+
 }
 
 void test_delete_node_with_children()
