@@ -548,13 +548,9 @@ void delete_node(PCB_node * nd)
 {
     free_res_held_by_PCB(nd);
     if(nd->process->status_type == READY || nd->process->status_type == RUNNING)
-    {
 	remove_PCB_from_RL(nd);
-    }
     else
-    {
         remove_from_res_waitList(nd);
-    }
     
     // remove from parent child array
     if(nd->process->parent != NULL)

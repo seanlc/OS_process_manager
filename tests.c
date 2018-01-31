@@ -35,7 +35,6 @@ void test_children_list_after_delete()
     print_PL();
 
     free(init->process->pid);
-    free(init->process);
     free(init);
 
 }
