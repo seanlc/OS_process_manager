@@ -92,25 +92,19 @@ void test_free_all_res_held_by_PCB()
 
 void test_child_linking()
 {
-    PCB_node * nd = (PCB_node *) malloc(sizeof(PCB_node));
-    nd->next = NULL;
-    PCB  p1 = Create("p1",1, NULL);
-    nd->process = &p1;
 
-    
-    PCB_node * nd2 = (PCB_node *) malloc(sizeof(PCB_node));
-    nd2->next = NULL;
-    PCB  p2 = Create("p2",1, nd);
-    nd2->process = &p2;
-    
-    PCB_node * nd3 = (PCB_node *) malloc(sizeof(PCB_node));
-    nd3->next = NULL;
-    PCB  p3 = Create("p3",1, nd);
-    nd3->process = &p3;
-    
-    PCB_info(nd);
+    PCB_node * init = (PCB_node * ) malloc(sizeof(PCB_node));
+    init->next = NULL;
+    PCB initial = Create("init", 0, NULL);
+    init->process = &initial;
 
-    PCB_info(nd2);
+    Create("p1",1,init);
+    Create("p2", 2, init);
+    Create("p3",2,init);
+    Create("p4",1,init);
+
+    print_children(init);
+    
 }
 
 void test_find_ready_PCB()
@@ -340,13 +334,12 @@ void test_get_PCB_node_by_pid()
     print_RCB_waitList(res1.waitList);
 
     print_RL();
-
 }
 
 int main()
 {
     init_resources();
-    test_get_PCB_node_by_pid();
+//    test_get_PCB_node_by_pid();
 //    test_delete_first_child_of_mult_sibs();
 //    test_get_running_proc();
 //    test_scheduler();
@@ -354,7 +347,7 @@ int main()
 //    test_delete_node();
 //    test_remove_first_process_on_blocked_list();
 //    test_free_all_res_held_by_PCB();
-//    test_child_linking();
+    test_child_linking();
 //    test_find_ready_PCB();
 //    test_remove_RCB_from_PCB();
 //    test_release();

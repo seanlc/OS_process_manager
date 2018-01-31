@@ -150,6 +150,8 @@ PCB Create(char * name, int priority, struct PCB_node * activeProc)
     curProc->priority = priority;
    
     // add to child link of parent
+    if(activeProc != NULL)
+        activeProc->process->children[activeProc->process->numChildren++] = pNode;
 
     // add to ready list
     add_to_RL(pNode, priority);
@@ -586,7 +588,7 @@ PCB_node * get_running_proc()
 }
 
 
-RCB * get_RCB_node_by_pid(int n)
+RCB * get_RCB_ptr_by_pid(int n)
 {
     RCB * rNode = NULL;
     switch(n)
@@ -628,7 +630,7 @@ PCB_node * get_PCB_node_by_pid(char * pid)
     RCB * res = NULL;
     for(int i = 1; i < 5; ++i)
     {
-        res = get_RCB_node_by_pid(i);
+        res = get_RCB_ptr_by_pid(i);
 	trav = res->waitList;
 	while(trav != NULL)
 	{
@@ -641,3 +643,12 @@ PCB_node * get_PCB_node_by_pid(char * pid)
     return NULL;
 }
 
+void print_children(PCB_node * nd)
+{
+    int numChild = nd->process->numChildren;
+    printf("children of process %s\n", nd->process->pid);
+    for(int i = 0; i < numChild; ++i)
+    {
+        printf("process %s\n", nd->process->children[i]->process->pid);
+    }
+}
