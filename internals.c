@@ -61,6 +61,27 @@ RCB res3;
 
 RCB res4;
 
+RCB * get_RCB_ptr_by_pid(int n)
+{
+    RCB * rNode = NULL;
+    switch(n)
+    {
+        case 1:
+	    rNode = &res1;
+	    break;
+	case 2:
+	    rNode = &res2;
+	    break;
+	case 3:
+	    rNode = &res3;
+	    break;
+	case 4:
+	    rNode = &res4;
+	    break;
+    }
+    return rNode;
+}
+
 void add_to_RL(struct PCB_node * process, int priority)
 { 
     struct PCB_node * trav = readyList[priority];
@@ -93,6 +114,7 @@ void PCB_info(PCB_node * nd)
     if(nd->process->parent != NULL)
 	printf("parent pid: %s\n", nd->process->parent->process->pid);
 }
+
 PCB_node *  get_highest_pri_proc()
 {
     PCB_node * trav;
@@ -114,6 +136,7 @@ void preempt(PCB_node * new, PCB_node * old)
         old->process->status_type = READY;
     printf("Process %s is now running\n", new->process->pid);
 }
+
 void Scheduler(PCB_node * activeProc)
 {
     PCB_node * pNode = get_highest_pri_proc();
@@ -163,6 +186,28 @@ PCB Create(char * name, int priority, struct PCB_node * activeProc)
     return *(pNode->process);
 }
 
+void print_RCB_waitList(PCB_node * lst)
+{
+    PCB_node * trav = lst;
+    while(trav != NULL)
+    {
+        printf("process: %s\n", trav->process->pid);
+        trav = trav->next;
+    }
+}
+
+void print_blocked_procs()
+{
+    RCB * res = NULL;
+    printf("blocked processes \n");
+    for(int i = 1; i < 5; ++i)
+    {
+        res = get_RCB_ptr_by_pid(i);
+	printf("resource %d: \n", i);
+	    print_RCB_waitList(res->waitList);
+    }
+}
+
 void print_RL()
 {
     struct PCB_node * trav;
@@ -183,10 +228,8 @@ void print_RL()
 void print_PL()
 {
     printf("ALL PROCESSES: \n");
-    for(int i = 0; i < numProc; ++i)
-    {
-        printf("process: %s ", procList[i]->process->pid);
-    }
+    print_RL();
+    print_blocked_procs();
     printf("\n");
 }
 
@@ -375,16 +418,6 @@ int request(int rid, int n, PCB_node * activeProc)
 }
 
 
-void print_RCB_waitList(PCB_node * lst)
-{
-    PCB_node * trav = lst;
-    printf("waiting list for resource: \n");
-    while(trav != NULL)
-    {
-        printf("process: %s\n", trav->process->pid);
-        trav = trav->next;
-    }
-}
 
 void remove_RCB_from_PCB(int rid, RCB_node ** lst)
 {
@@ -546,27 +579,21 @@ void delete_node(PCB_node * nd)
 	    remove_PCB_from_waitList(&res4.waitList,  nd->process->pid);
     }
     remove_PCB_entry_from_PL(nd);
+    // TODO
+    // if parent != NULL
+    // remove from parent child array
     free(nd->process->pid);
     free(nd->process);
     free(nd);
 }
 
-void kill_tree(PCB_node * nd)
-{
-    if(nd->next_sib == NULL)
-        delete_node(nd);
-    else
-    {
-        kill_tree(nd->next_sib);
-	delete_node(nd);
-    }
-}
-
 void destroy_process(PCB_node * nd)
 {
     PCB_node * proc = nd;
-//    if(proc->process->children != NULL)
-//        kill_tree(proc->process->children);
+    for(int i = 0; i < nd->process->numChildren; ++i)
+    {
+        destroy_process(nd->process->children[i]);
+    }
     delete_node(proc);
     Scheduler(nd);
 }
@@ -587,27 +614,6 @@ PCB_node * get_running_proc()
     return trav;
 }
 
-
-RCB * get_RCB_ptr_by_pid(int n)
-{
-    RCB * rNode = NULL;
-    switch(n)
-    {
-        case 1:
-	    rNode = &res1;
-	    break;
-	case 2:
-	    rNode = &res2;
-	    break;
-	case 3:
-	    rNode = &res3;
-	    break;
-	case 4:
-	    rNode = &res4;
-	    break;
-    }
-    return rNode;
-}
 
 PCB_node * get_PCB_node_by_pid(char * pid)
 {
