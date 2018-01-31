@@ -360,6 +360,7 @@ int request(int rid, int n, PCB_node * activeProc)
         activeProc->process->status_type = BLOCKED;
         // remove self from readyList
         remove_PCB_from_RL(activeProc);
+	activeProc->next = NULL;
         // add self to res waitList
         add_PCB_to_waitList(activeProc, res);
         activeProc->process->list = res->waitList; 
@@ -375,7 +376,7 @@ int request(int rid, int n, PCB_node * activeProc)
 void print_RCB_waitList(PCB_node * lst)
 {
     PCB_node * trav = lst;
-    printf("waiting list for resource: ");
+    printf("waiting list for resource: \n");
     while(trav != NULL)
     {
         printf("process: %s\n", trav->process->pid);

@@ -325,7 +325,13 @@ void test_get_PCB_node_by_pid()
     Create("p4",1,init);
 
     printf("p3 requests 1 of res1\n");   
-    request(1,1,get_PCB_node_by_pid("p3"));    
+    request(1,1,get_PCB_node_by_pid("p3"));
+    
+    printf("waiting list for res1\n");
+    print_RCB_waitList(res1.waitList);
+
+    printf("resources held by p3\n");
+    print_PCB_res_list(get_PCB_node_by_pid("p3")->process->other_resources);
 
     printf("p2 requests 1 of res1\n");
     request(1,1,get_PCB_node_by_pid("p2"));    
@@ -334,12 +340,6 @@ void test_get_PCB_node_by_pid()
     print_RCB_waitList(res1.waitList);
 
     print_RL();
-
-    PCB_node * found_PCB = get_PCB_node_by_pid("p2");
-    if(found_PCB != NULL)
-        printf("found PCB_node with process pid: %s\n", found_PCB->process->pid);
-    else
-        printf("nothing found\n");
 
 }
 
