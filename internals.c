@@ -632,4 +632,12 @@ void print_children(PCB_node * nd)
 }
 
 //TODO
-void Timeout();
+void timeout()
+{
+    PCB_node * runningProc = get_running_proc();
+    remove_PCB_from_RL(runningProc);
+    runningProc->next = NULL;
+    runningProc->process->status_type = READY;
+    add_to_RL(runningProc, runningProc->process->priority);
+    Scheduler(runningProc);
+}

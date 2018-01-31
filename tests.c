@@ -426,10 +426,50 @@ void test_get_PCB_node_by_pid()
 
 }
 
+void test_timeout()
+{
+
+    PCB_node * init = (PCB_node * ) malloc(sizeof(PCB_node));
+    init->next = NULL;
+    PCB initial = Create("init", 0, NULL);
+    init->process = &initial;
+
+    Create("p1",1, init);
+    Create("p2",1, get_PCB_node_by_pid("p1"));
+    Create("p3",1, get_PCB_node_by_pid("p1"));
+    Create("p4",1, get_PCB_node_by_pid("p3"));
+    Create("p5",1, get_PCB_node_by_pid("p3"));
+    Create("p6",1, init);
+    Create("p7",1, get_PCB_node_by_pid("p6"));
+    Create("p8",1, get_PCB_node_by_pid("p6"));
+    Create("p9",1, get_PCB_node_by_pid("p6"));
+   
+    request(1,1, get_PCB_node_by_pid("p1"));
+    request(1,1, get_PCB_node_by_pid("p5"));
+    request(1,1, get_PCB_node_by_pid("p6"));
+    request(1,1, get_PCB_node_by_pid("p7"));
+    request(1,1, get_PCB_node_by_pid("p8"));
+
+    print_PL();
+    
+    timeout();
+    
+    print_PL();
+
+    timeout();
+    
+    print_PL();
+    
+    timeout();
+    
+    print_PL();
+}
+
 int main()
 {
     init_resources();
-    test_children_list_after_delete();
+    test_timeout();
+//    test_children_list_after_delete();
 //    test_delete_node_with_children();
 //    test_print_PL();
 //    test_get_PCB_node_by_pid();
