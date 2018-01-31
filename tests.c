@@ -1,6 +1,36 @@
 #include "stdio.h"
 #include "internals.c"
 
+
+
+void test_delete_node_with_children()
+{
+    PCB_node * init = (PCB_node * ) malloc(sizeof(PCB_node));
+    init->next = NULL;
+    PCB initial = Create("init", 0, NULL);
+    init->process = &initial;
+
+    Create("p1",1, init);
+    Create("p2",1, get_PCB_node_by_pid("p1"));
+    Create("p3",1, get_PCB_node_by_pid("p1"));
+    Create("p4",1, get_PCB_node_by_pid("p3"));
+    Create("p5",1, get_PCB_node_by_pid("p3"));
+    Create("p6",1, init);
+    Create("p7",1, get_PCB_node_by_pid("p6"));
+    Create("p8",1, get_PCB_node_by_pid("p6"));
+   
+    request(1,1, get_PCB_node_by_pid("p1"));
+    request(1,1, get_PCB_node_by_pid("p5"));
+    request(1,1, get_PCB_node_by_pid("p6"));
+    request(1,1, get_PCB_node_by_pid("p7"));
+    request(1,1, get_PCB_node_by_pid("p8"));
+
+    print_PL();
+
+    destroy_process(get_PCB_node_by_pid("p1"));
+
+    print_PL();
+}
 void test_scheduler()
 {
     Create("p1", 1, NULL);
@@ -363,13 +393,14 @@ void test_get_PCB_node_by_pid()
 int main()
 {
     init_resources();
+    test_delete_node_with_children();
 //    test_print_PL();
 //    test_get_PCB_node_by_pid();
 //    test_delete_first_child_of_mult_sibs();
 //    test_get_running_proc();
 //    test_scheduler();
 //    test_get_highest_pri_proc();
-    test_delete_node();
+//    test_delete_node();
 //    test_remove_first_process_on_blocked_list();
 //    test_free_all_res_held_by_PCB();
 //    test_child_linking();
