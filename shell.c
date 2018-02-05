@@ -1,35 +1,7 @@
 #include "internals.c"
 
-void tokenize_input(char * tok)
-{
-    if(strcmp(tok, "init") == 0)
-    {
-        printf("found_init\n");
-    }
-    else if(strcmp(tok, "cr") == 0)
-    {
-        printf("found cr\n");
-    }
-    else if(strcmp(tok, "de") == 0)
-    {
-        printf("found de\n");
-    }
-    else if(strcmp(tok, "rel") == 0)
-    {
-        printf("found rel\n");
-    }
-    else if(strcmp(tok, "to") == 0)
-    {
-        printf("found to\n");
-    }
-    else if(strcmp(tok, "req") == 0)
-    {
-        printf("found req\n");
-    }
-    else
-	printf("command not recognized\n");
-} 
-
+PCB_node * curProc;
+PCB_node * init;
 void strip_newline(char * str)
 {
     for(int i = 0; str[i]; ++i)
@@ -42,8 +14,84 @@ void strip_newline(char * str)
     }
 }
 
+int get_rNumber_from_rName(char * rName)
+{
+    int rNumber = 0;
+    if(strcmp(rName, "R1") == 0)
+	rNumber = 1;
+    else if(strcmp(rName, "R2") == 0)
+	rNumber = 2;
+    else if(strcmp(rName, "R3") == 0)
+	rNumber = 3;
+    else if(strcmp(rName, "R4") == 0)
+	rNumber = 4;
+
+    return rNumber;
+}
+void tokenize_input(char * tok, const char * delim)
+{
+    if(strcmp(tok, "init") == 0)
+    {
+	destroy_children(init);
+    }
+    else if(strcmp(tok, "cr") == 0)
+    {
+        char * pName = strtok(NULL, delim);
+	int priority = atoi(strtok(NULL, delim));
+	Create(pName, priority, curProc);
+    }
+    else if(strcmp(tok, "de") == 0)
+    {
+        char * pName = strtok(NULL, delim);
+	strip_newline(pName);
+	destroy_process(get_PCB_node_by_pid(pName));
+    }
+    else if(strcmp(tok, "rel") == 0)
+    {
+	char * rName = strtok(NULL, delim);
+        int rNumber = get_rNumber_from_rName(rName);
+
+	int count = atoi(strtok(NULL, delim));
+
+	release(rNumber, count, curProc);
+    }
+    else if(strcmp(tok, "to") == 0)
+    {
+        timeout();
+    }
+    else if(strcmp(tok, "req") == 0)
+    {
+	char * rName = strtok(NULL, delim);
+	int rNumber = get_rNumber_from_rName(rName);
+	
+	int count = atoi(strtok(NULL, delim));
+	request(rNumber, count, curProc);
+    }
+    else if(strcmp(tok, "plist") == 0)
+    {
+        print_PL();
+    }
+    else if(strcmp(tok, "rlist") == 0)
+    {
+        print_res_list();
+    }
+    else
+	printf("command not recognized\n");
+    curProc = get_running_proc();
+    printf("%s\n", curProc->process->pid);
+} 
+
+
 int main()
 {
+    init = (PCB_node * ) malloc(sizeof(PCB_node));
+    init->next = NULL;
+    PCB initial = Create("init", 0, NULL);
+    init->process = &initial;
+    curProc = init;
+    init_resources();
+    printf("%s\n", curProc->process->pid);
+
     char s[256] = "";
     const char delim[2] = " ";
     char * tok = NULL;
@@ -54,7 +102,7 @@ int main()
 
         tok = strtok(s, delim);
 	strip_newline(tok);
-	tokenize_input(tok);
+	tokenize_input(tok, delim);
     }
     return 0;
 }

@@ -125,12 +125,27 @@ PCB_node *  get_highest_pri_proc()
     return NULL;
 }
 
+PCB_node * get_running_proc()
+{
+    PCB_node * trav = NULL;
+    for(int i = 2; i > -1; --i)
+    {
+        trav = readyList[i];
+	while(trav != NULL)
+	{
+	    if(trav->process->status_type == RUNNING)
+	        return trav;
+	    trav = trav->next;
+	}
+    }
+    return trav;
+}
+
 void preempt(PCB_node * new, PCB_node * old)
 {
     new->process->status_type = RUNNING;
-    if(old != NULL && old->process->status_type == RUNNING)
+    if(old != NULL && old->process->status_type == RUNNING && old != new)
         old->process->status_type = READY;
-    printf("Process %s is now running\n", new->process->pid);
 }
 
 void Scheduler(PCB_node * activeProc)
@@ -139,7 +154,7 @@ void Scheduler(PCB_node * activeProc)
     if(pNode == NULL)
         printf("There is no process to run\n");
     else if(activeProc == NULL || activeProc->process->priority < pNode->process->priority || activeProc->process->status_type != RUNNING)
-        preempt(pNode, activeProc);
+            preempt(pNode, activeProc);
 }
 
 PCB Create(char * name, int priority, struct PCB_node * activeProc)
@@ -481,7 +496,7 @@ int release(int rid, int n, PCB_node * activeProc)
 	// if found, have proc claim resources and move to ready list
 	while((launchProc = find_ready_PCB_on_waitList(res->waitList, res->u)) != NULL)
         {
-	    printf("found ready process %s\n", launchProc->process->pid);
+//	    printf("found ready process %s\n", launchProc->process->pid);
 	    // remove found PCB from res waitList
 	    remove_PCB_from_waitList( &res->waitList, launchProc->process->pid);
 
@@ -511,7 +526,7 @@ void free_res_held_by_PCB(PCB_node * proc)
     RCB_node * res = proc->process->other_resources;
     while(res != NULL)
     {
-        printf("resource found with rid %d and count %d\n", res->resource->rid, res->num);
+//        printf("resource found with rid %d and count %d\n", res->resource->rid, res->num);
 	release(res->resource->rid, res->num, proc);
 	res = proc->process->other_resources;
     }
@@ -570,22 +585,12 @@ void destroy_process(PCB_node * nd)
     Scheduler(NULL);
 }
 
-PCB_node * get_running_proc()
+void destroy_children(PCB_node * nd)
 {
-    PCB_node * trav = NULL;
-    for(int i = 2; i > -1; --i)
-    {
-        trav = readyList[i];
-	while(trav != NULL)
-	{
-	    if(trav->process->status_type == RUNNING)
-	        return trav;
-	    trav = trav->next;
-	}
-    }
-    return trav;
+    for(int i = nd->process->numChildren-1; i > -1; --i)
+        destroy_process(nd->process->children[i]);
+    Scheduler(NULL);
 }
-
 
 PCB_node * get_PCB_node_by_pid(char * pid)
 {
@@ -631,7 +636,6 @@ void print_children(PCB_node * nd)
     }
 }
 
-//TODO
 void timeout()
 {
     PCB_node * runningProc = get_running_proc();
@@ -640,4 +644,16 @@ void timeout()
     runningProc->process->status_type = READY;
     add_to_RL(runningProc, runningProc->process->priority);
     Scheduler(runningProc);
+}
+
+void print_res_list()
+{
+    RCB * res = NULL;
+    printf("resources:\n");
+    for(int i = 1; i < 5; ++i)
+    {
+        res = get_RCB_ptr_by_pid(i);
+	printf("resource %d \tintial: %d \tcurrent: %d\n", res->rid, res->k, res->u);
+    }
+    printf("\n");
 }

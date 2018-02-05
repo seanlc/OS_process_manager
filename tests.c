@@ -1,7 +1,38 @@
 #include "stdio.h"
 #include "internals.c"
 
+void test_shell_scenar()
+{
+    PCB_node * init = (PCB_node * ) malloc(sizeof(PCB_node));
+    init->next = NULL;
+    PCB initial = Create("init", 0, NULL);
+    init->process = &initial;
 
+    Create("p1", 1, init);
+    request(1,1, get_PCB_node_by_pid("p1"));
+
+    Create("p2", 1, get_PCB_node_by_pid("p1"));
+    request(2,2, get_PCB_node_by_pid("p2"));
+
+    Create("p3", 2, get_PCB_node_by_pid("p2"));
+    request(3,3, get_PCB_node_by_pid("p3"));
+
+    Create("p4", 2, get_PCB_node_by_pid("p3"));
+    request(4,4, get_PCB_node_by_pid("p4"));
+
+    request(1,1, get_PCB_node_by_pid("p4"));
+    request(2,1, get_PCB_node_by_pid("p3"));
+    request(3,1, get_PCB_node_by_pid("p2"));
+    request(4,1, get_PCB_node_by_pid("p1"));
+
+    Create("p5", 1, init);
+
+    print_PL();
+
+    destroy_children(init);
+
+    print_PL();
+}
 
 void test_children_list_after_delete()
 {
@@ -468,7 +499,8 @@ void test_timeout()
 int main()
 {
     init_resources();
-    test_timeout();
+    test_shell_scenar();
+//    test_timeout();
 //    test_children_list_after_delete();
 //    test_delete_node_with_children();
 //    test_print_PL();
