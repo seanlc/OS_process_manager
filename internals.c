@@ -78,6 +78,39 @@ RCB * get_RCB_ptr_by_pid(int n)
     return rNode;
 }
 
+PCB_node * get_PCB_node_by_pid(char * pid)
+{
+    PCB_node * trav = NULL;
+
+    // look on readyList
+    for(int i = 0; i < 3; ++i)
+    {
+        trav = readyList[i];
+        while(trav != NULL)
+        {
+	    if(strcmp(trav->process->pid, pid) == 0)
+                return trav;
+	    trav = trav->next;
+	}
+    }
+
+    // look on resource waitList
+    
+    RCB * res = NULL;
+    for(int i = 1; i < 5; ++i)
+    {
+        res = get_RCB_ptr_by_pid(i);
+	trav = res->waitList;
+	while(trav != NULL)
+	{
+	    if(strcmp(trav->process->pid, pid) == 0)
+	        return trav;
+	    trav = trav->next;
+	}
+    }
+
+    return NULL;
+}
 void add_to_RL(struct PCB_node * process, int priority)
 { 
     struct PCB_node * trav = readyList[priority];
@@ -480,7 +513,7 @@ int release(int rid, int n, PCB_node * activeProc)
     res_node = find_res_node(rid, activeProc);
 //    printf("foudn RCB_node with rid %d and count %d\n", res_node->resource->rid, res_node->num);
 
-    if(res_node->num >= n)
+    if(res_node != NULL && res_node->num >= n)
     {
 	// decrease count of resource in RCB_node held in other_resources
         res_node->num -= n;
@@ -592,39 +625,6 @@ void destroy_children(PCB_node * nd)
     Scheduler(NULL);
 }
 
-PCB_node * get_PCB_node_by_pid(char * pid)
-{
-    PCB_node * trav = NULL;
-
-    // look on readyList
-    for(int i = 0; i < 3; ++i)
-    {
-        trav = readyList[i];
-        while(trav != NULL)
-        {
-	    if(strcmp(trav->process->pid, pid) == 0)
-                return trav;
-	    trav = trav->next;
-	}
-    }
-
-    // look on resource waitList
-    
-    RCB * res = NULL;
-    for(int i = 1; i < 5; ++i)
-    {
-        res = get_RCB_ptr_by_pid(i);
-	trav = res->waitList;
-	while(trav != NULL)
-	{
-	    if(strcmp(trav->process->pid, pid) == 0)
-	        return trav;
-	    trav = trav->next;
-	}
-    }
-
-    return NULL;
-}
 
 void print_children(PCB_node * nd)
 {

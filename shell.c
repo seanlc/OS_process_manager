@@ -38,7 +38,8 @@ void tokenize_input(char * tok, const char * delim)
     {
         char * pName = strtok(NULL, delim);
 	int priority = atoi(strtok(NULL, delim));
-	Create(pName, priority, curProc);
+	if(get_PCB_node_by_pid(pName) == NULL)
+	    Create(pName, priority, curProc);
     }
     else if(strcmp(tok, "de") == 0)
     {
