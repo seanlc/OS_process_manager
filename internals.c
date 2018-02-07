@@ -505,7 +505,7 @@ int release(int rid, int n, PCB_node * activeProc)
 	    break;
         
 	default:
-            printf("request made for nonexistant resource");
+            printf("request made for nonexistant resource\n");
             return -1;
     }
     

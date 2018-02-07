@@ -1,4 +1,5 @@
 #include "internals.c"
+#include "ctype.h"
 
 PCB_node * curProc;
 PCB_node * init;
@@ -37,15 +38,17 @@ void tokenize_input(char * tok, const char * delim)
     else if(strcmp(tok, "cr") == 0)
     {
         char * pName = strtok(NULL, delim);
-	int priority = atoi(strtok(NULL, delim));
-	if(get_PCB_node_by_pid(pName) == NULL)
+	char * pString = strtok(NULL, delim);
+	int priority = atoi(pString);
+	if(get_PCB_node_by_pid(pName) == NULL && priority > 0 && priority < 3 && isdigit(pString[0]))
 	    Create(pName, priority, curProc);
     }
     else if(strcmp(tok, "de") == 0)
     {
         char * pName = strtok(NULL, delim);
 	strip_newline(pName);
-	destroy_process(get_PCB_node_by_pid(pName));
+	if(get_PCB_node_by_pid(pName) != NULL && strcmp(pName, "init") != 0)
+	    destroy_process(get_PCB_node_by_pid(pName));
     }
     else if(strcmp(tok, "rel") == 0)
     {
@@ -53,8 +56,8 @@ void tokenize_input(char * tok, const char * delim)
         int rNumber = get_rNumber_from_rName(rName);
 
 	int count = atoi(strtok(NULL, delim));
-
-	release(rNumber, count, curProc);
+        if(rNumber != 0 && count > -3)
+	    release(rNumber, count, curProc);
     }
     else if(strcmp(tok, "to") == 0)
     {
@@ -66,7 +69,8 @@ void tokenize_input(char * tok, const char * delim)
 	int rNumber = get_rNumber_from_rName(rName);
 	
 	int count = atoi(strtok(NULL, delim));
-	request(rNumber, count, curProc);
+	if(rNumber != 0  && count > 0)
+	    request(rNumber, count, curProc);
     }
     else if(strcmp(tok, "plist") == 0)
     {
