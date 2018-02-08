@@ -486,6 +486,7 @@ int release(int rid, int n, PCB_node * activeProc)
     RCB_node * res_node = NULL;
     PCB_node * launchProc = NULL;
     struct RCB_node * res_alloc;
+ //   printf("rid: %d\n", rid);
     switch(rid)
     {
         case 1:
@@ -656,4 +657,41 @@ void print_res_list()
 	printf("resource %d \tintial: %d \tcurrent: %d\n", res->rid, res->k, res->u);
     }
     printf("\n");
+}
+
+void delete_RL()
+{
+    PCB_node * trav = NULL;
+    for(int i = 2; i > 0; --i)
+    {
+	while((trav = readyList[i]) != NULL)
+	{
+	//    readyList[i] = readyList[i]->next;
+	    destroy_process(trav);
+	}
+
+    }
+}
+
+void delete_waitList()
+{
+    RCB * res = NULL;
+    PCB_node * trav = NULL;
+
+    for(int i = 1; i < 5; ++i)
+    {
+        res = get_RCB_ptr_by_pid(i);
+	trav = res->waitList;
+	while((trav = res->waitList) != NULL)
+	{
+	    res->waitList = res->waitList->next;
+	    destroy_process(trav);
+	}
+    }
+}
+
+void destroy_all_proc()
+{
+    delete_waitList();
+    delete_RL();
 }

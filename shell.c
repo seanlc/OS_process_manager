@@ -33,7 +33,7 @@ void tokenize_input(char * tok, const char * delim)
 {
     if(strcmp(tok, "init") == 0)
     {
-	destroy_children(init);
+	destroy_all_proc();
     }
     else if(strcmp(tok, "cr") == 0)
     {
