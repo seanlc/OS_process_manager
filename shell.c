@@ -81,13 +81,15 @@ void tokenize_input(char * tok, const char * delim)
         print_res_list();
     }
     else
-	printf("command not recognized\n");
+    {
+	printf("command not recognized: %s\n", tok);
+    }
     curProc = get_running_proc();
     printf("%s\n", curProc->process->pid);
 } 
 
 
-int main()
+int main(int argc, char * argv[])
 {
     init = (PCB_node * ) malloc(sizeof(PCB_node));
     init->next = NULL;
@@ -100,10 +102,26 @@ int main()
     char s[256] = "";
     const char delim[2] = " ";
     char * tok = NULL;
+    FILE * file = stdin;
+    if(argc > 1)
+    {
+        if((file = fopen(argv[1], "r")) == NULL)
+	{
+	    printf("file at %s could not be found\n", argv[1]);
+	}
+    }
     
     while(1)
     {
-        fgets(s, 256 , stdin);
+        if(fgets(s, 256 , file) == NULL)
+	    return 0;
+    //    printf("line read: %s\n", s);
+    
+        while(strcmp("\n", s) == 0)
+	{
+	    if (fgets(s, 256, file) == NULL)
+	        return 0;
+	}
 
         tok = strtok(s, delim);
 	strip_newline(tok);
