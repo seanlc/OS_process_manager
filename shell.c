@@ -29,7 +29,7 @@ int get_rNumber_from_rName(char * rName)
 
     return rNumber;
 }
-void tokenize_input(char * tok, const char * delim)
+void tokenize_input(char * tok, const char * delim, FILE * fp)
 {
     if(strcmp(tok, "init") == 0)
     {
@@ -82,10 +82,10 @@ void tokenize_input(char * tok, const char * delim)
     }
     else
     {
-	printf("command not recognized: %s\n", tok);
+	fprintf(fp, "error: %s \n", tok);
     }
     curProc = get_running_proc();
-    printf("%s\n", curProc->process->pid);
+    fprintf(fp, "%s ", curProc->process->pid);
 } 
 
 
@@ -97,11 +97,12 @@ int main(int argc, char * argv[])
     init->process = &initial;
     curProc = init;
     init_resources();
-    printf("%s\n", curProc->process->pid);
 
     char s[256] = "";
     const char delim[2] = " ";
     char * tok = NULL;
+
+    // setup file input
     FILE * file = stdin;
     if(argc > 1)
     {
@@ -110,6 +111,14 @@ int main(int argc, char * argv[])
 	    printf("file at %s could not be found\n", argv[1]);
 	}
     }
+
+    // setup file output
+    FILE * fp = NULL;
+    if( (fp = fopen("output.txt", "w+")) == NULL )
+        fprintf(stderr, "could not create output file\n");
+
+    
+    fprintf(fp,"%s ", curProc->process->pid);
     
     while(1)
     {
@@ -119,13 +128,14 @@ int main(int argc, char * argv[])
     
         while(strcmp("\n", s) == 0)
 	{
+	    fprintf(fp,"\n");
 	    if (fgets(s, 256, file) == NULL)
 	        return 0;
 	}
 
         tok = strtok(s, delim);
 	strip_newline(tok);
-	tokenize_input(tok, delim);
+	tokenize_input(tok, delim, fp);
     }
     return 0;
 }
