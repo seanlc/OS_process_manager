@@ -103,21 +103,27 @@ int main(int argc, char * argv[])
     char * tok = NULL;
 
     // setup file input
-    FILE * file = stdin;
-    if(argc > 1)
+    FILE * file = NULL;
+    FILE * fp = NULL;
+    if(argc >= 2)
     {
         if((file = fopen(argv[1], "r")) == NULL)
 	{
 	    printf("file at %s could not be found\n", argv[1]);
 	}
+	
+    // setup file output
+        if( (fp = fopen(argv[2], "w+")) == NULL )
+	{
+            fprintf(stderr, "could not create output file\n");
+	}
     }
 
-    // setup file output
-    FILE * fp = NULL;
-    if( (fp = fopen("output.txt", "w+")) == NULL )
-        fprintf(stderr, "could not create output file\n");
+    if(file == NULL)
+        file = stdin;
+    if(fp == NULL)
+	fp = fopen("out.txt", "w+");
 
-    
     fprintf(fp,"%s ", curProc->process->pid);
     
     while(1)
